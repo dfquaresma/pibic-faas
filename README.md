@@ -1,1 +1,1 @@
-# pibic-faas
+# PIBIC-FaaS
