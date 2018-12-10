@@ -1,7 +1,7 @@
 import time
 
 def handle(req):
-    msg_size = 16384
+    msg_size = 2 ** 21 # it makes the resulting list size near 16MB
 
     before = time.time()
     byte_array = list()
