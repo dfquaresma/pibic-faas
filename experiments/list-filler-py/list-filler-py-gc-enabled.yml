@@ -6,7 +6,3 @@ functions:
     lang: python3
     handler: ./list-filler-py-gc-enabled
     image: dfquaresma/list-filler-py-gc-enabled:latest
-  list-filler-py-gc-disabled:
-    lang: python3
-    handler: ./list-filler-py-gc-disabled
-    image: dfquaresma/list-filler-py-gc-disabled:latest

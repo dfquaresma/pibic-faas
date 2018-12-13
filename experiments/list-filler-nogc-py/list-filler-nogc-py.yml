@@ -1,8 +1,0 @@
-provider:
-  name: faas
-  gateway: http://127.0.0.1:8080
-functions:
-  list-filler-nogc-py:
-    lang: python3
-    handler: ./list-filler-nogc-py
-    image: dfquaresma/list-filler-nogc-py:latest
