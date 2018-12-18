@@ -1,8 +1,0 @@
-provider:
-  name: faas
-  gateway: http://127.0.0.1:8080
-functions:
-  pid-printer:
-    lang: python3
-    handler: ./pid-printer
-    image: dfquaresma/pid-printer:latest
