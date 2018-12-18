@@ -11,8 +11,8 @@ public class Handler implements com.openfaas.model.IHandler {
         Response res = new Response();
 
         String processName = java.lang.management.ManagementFactory.getRuntimeMXBean().getName();
-	String pid = Long.toString(Long.parseLong(processName.split("@")[0]));
-	res.setBody(pid);
+	long pid = Long.parseLong(processName.split("@")[0]);
+	res.setBody(Long.toString(pid));
 
 	return res;
     }
