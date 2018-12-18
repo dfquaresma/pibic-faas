@@ -38,8 +38,8 @@ public class Handler implements com.openfaas.model.IHandler {
         long pid = Long.parseLong(processName.split("@")[0]);
 
         String data =
-                "Business Logic Time in Milliseconds: " + Long.toString(after - before) +
-                ",  pid: " + Long.toString(pid) + System.lineSeparator() +
+		"pid: " + Long.toString(pid) +
+                ", Business Logic Time in Milliseconds: " + Long.toString(after - before) + System.lineSeparator() +
                 "Scavenge Number of Collections: " + Long.toString(countAfterScavenge - countBeforeScavenge) +
                 ", Scavenge Collections Time Spent in Milliseconds: " + Long.toString(timeAfterScavenge - timeBeforeScavenge) + System.lineSeparator() +
                 "MarkSweep Number of Collections: " + Long.toString(countAfterMarkSweep - countBeforeMarkSweep) +
