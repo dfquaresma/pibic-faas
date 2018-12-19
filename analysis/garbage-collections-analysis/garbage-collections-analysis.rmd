@@ -24,6 +24,22 @@ boxplot(nocollect$business_time.ms., outline=FALSE)
 ```
 
 ```{r}
+mean(nocollect$business_time.ms.)
+var(nocollect$business_time.ms.)
+sd(nocollect$business_time.ms.)
+quantile(nocollect$business_time.ms.)
+```
+
+
+
+```{r}
 withcollect <- filter(results, scavenge_count + marksweep_count > 0)
 boxplot(withcollect$business_time.ms., outline=FALSE)
+```
+
+```{r}
+mean(withcollect$business_time.ms.)
+var(withcollect$business_time.ms.)
+sd(withcollect$business_time.ms.)
+quantile(withcollect$business_time.ms.)
 ```
