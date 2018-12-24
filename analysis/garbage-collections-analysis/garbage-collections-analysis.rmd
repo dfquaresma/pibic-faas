@@ -7,10 +7,6 @@ output: html_document
 
 ```{r setup, include=FALSE}
 require(dplyr)
-require(stringr)
-require(cowplot)
-require(ggplot2)
-require(reshape2)
 ```
 
 # Introdução
@@ -34,7 +30,7 @@ Os resultados analisados neste documento foram obtidos através da execução de
 
 # Resultados
 ```{r}
-results = read.csv("../curl-workload/results/r0.csv", header=T, dec=".")
+results = read.csv("../curl-workload/business-logic-results/r0.csv", header=T, dec=".")
 plot(results$business_time.ms., results$scavenge_count + results$marksweep_count, xlim=c(0,750), xlab="tempo de execução (ms)", ylab="numero de coletas")
 ```
 
