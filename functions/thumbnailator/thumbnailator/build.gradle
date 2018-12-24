@@ -22,6 +22,9 @@ dependencies {
     testImplementation 'junit:junit:4.12'
 
     compile project(':model')
+
+    // Thumbnailator
+    compile group: 'net.coobird', name: 'thumbnailator', version: '0.4.1'
 }
 
 // In this section you declare where to find the dependencies of your project
