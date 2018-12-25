@@ -53,11 +53,21 @@ public class Handler implements com.openfaas.model.IHandler {
         return res;
     }
 
-    public String callFunction(String url) {
+    public String callFunction(String input) {
+        String[] inputSplit = input.split(" ");
+        
+        String url = inputSplit[0];
+        int widthSize = Integer.parseInt(inputSplit[1]);
+        int heightSize = Integer.parseInt(inputSplit[2]);
+        int rotate = Integer.parseInt(inputSplit[3]);
+        double outputQuality = Double.parseDouble(inputSplit[4]);
+
         String err = "";
         try {
             Thumbnails.of(new URL(url))
-                .size(160, 160)
+                .size(widthSize, heightSize)
+                .rotate(rotate)
+                .outputQuality(outputQuality)
                 .toFile("thumbnail.jpg");
         } catch (Exception e) {
             err = e.getMessage();
