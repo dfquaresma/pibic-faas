@@ -26,7 +26,7 @@ public class Handler implements com.openfaas.model.IHandler {
         long timeBeforeMarkSweep = markSweep.getCollectionTime();
 
 	long before = System.currentTimeMillis();
-        callThumbnailFunction();
+	Thumbnails.of("image.jpg").size(160, 160);
 	long after = System.currentTimeMillis();
 
         long countAfterScavenge = scavenge.getCollectionCount();
@@ -48,12 +48,5 @@ public class Handler implements com.openfaas.model.IHandler {
 	Response res = new Response();
  	res.setBody(data);
 	return res;
-
     }
-
-    public void callThumbnailFunction() {
-	Thumbnails.of("image.jpg")
-        .size(160, 160);
-    }
-
 }
