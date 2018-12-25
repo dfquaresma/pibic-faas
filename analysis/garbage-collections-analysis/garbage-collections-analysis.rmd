@@ -29,40 +29,52 @@ Os resultados analisados neste documento foram obtidos através da execução de
 - Contabiliza o tempo total de execução da lógica de negócio.
 
 # Resultados
+### Plot
 ```{r}
 results = read.csv("../curl-workload/business-logic-results/r0.csv", header=T, dec=".")
 plot(results$business_time.ms., results$scavenge_count + results$marksweep_count, xlim=c(0,750), xlab="tempo de execução (ms)", ylab="numero de coletas")
 ```
 
 
+### Quantiles
+#### Não Ocorreu Coleta
 ```{r}
 nocollect <- filter(results, scavenge_count + marksweep_count == 0)
+quantile(nocollect$business_time.ms., c(.0, .25, .50, .75, .90, .99, .999))
+```
+
+#### Ocorreu Coleta
+```{r}
+withcollect <- filter(results, scavenge_count + marksweep_count > 0)
+quantile(withcollect$business_time.ms., c(.0, .25, .50, .75, .90, .99, .999))
+```
+
+
+### Boxplot
+#### Não Ocorreu Coleta
+```{r}
 boxplot(nocollect$business_time.ms., outline=FALSE)
 ```
 
+#### Ocorreu Coleta
+```{r}
+boxplot(withcollect$business_time.ms., outline=FALSE)
+```
+
+
+### Média, Variância e Desvio Padrão 
+#### Não Ocorreu Coleta
 ```{r}
 mean(nocollect$business_time.ms.)
 var(nocollect$business_time.ms.)
 sd(nocollect$business_time.ms.)
 ```
 
-```{r}
-quantile(nocollect$business_time.ms., c(.0, .25, .50, .75, .90, .99, .999))
-```
-
-
-
-```{r}
-withcollect <- filter(results, scavenge_count + marksweep_count > 0)
-boxplot(withcollect$business_time.ms., outline=FALSE)
-```
-
+#### Ocorreu Coleta
 ```{r}
 mean(withcollect$business_time.ms.)
 var(withcollect$business_time.ms.)
 sd(withcollect$business_time.ms.)
 ```
 
-```{r}
-quantile(withcollect$business_time.ms., c(.0, .25, .50, .75, .90, .99, .999))
-```
+
