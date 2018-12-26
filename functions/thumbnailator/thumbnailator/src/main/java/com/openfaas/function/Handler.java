@@ -72,10 +72,10 @@ public class Handler implements com.openfaas.model.IHandler {
     public String callFunction() {
         String err = "";
         try {
-            Thumbnails.of(url)
-                .size(widthSize, heightSize)
-                .rotate(rotate)
-                .outputQuality(outputQuality);
+            Thumbnails.of(this.url)
+                .size(this.widthSize, this.heightSize)
+                .rotate(this.rotate)
+                .outputQuality(this.outputQuality);
         } catch (Exception e) {
             err = e.getMessage();
         }
