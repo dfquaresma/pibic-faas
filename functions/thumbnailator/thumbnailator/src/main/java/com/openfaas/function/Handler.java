@@ -13,6 +13,8 @@ import java.util.ArrayList;
 
 import net.coobird.thumbnailator.Thumbnails;
 import java.net.URL;
+import java.awt.image.BufferedImage;
+import javax.imageio.ImageIO;
 
 public class Handler implements com.openfaas.model.IHandler {
 
@@ -27,7 +29,7 @@ public class Handler implements com.openfaas.model.IHandler {
         long timeBeforeMarkSweep = markSweep.getCollectionTime();
         long before = System.currentTimeMillis();
 
-        String err = callFunction(req.getBody());
+        String err = callFunction();
 
         long after = System.currentTimeMillis();
         long countAfterScavenge = scavenge.getCollectionCount();
@@ -53,25 +55,36 @@ public class Handler implements com.openfaas.model.IHandler {
         return res;
     }
 
-    public String callFunction(String input) {
-        String[] inputSplit = input.split(" ");
-        
-        String url = inputSplit[0];
-        int widthSize = Integer.parseInt(inputSplit[1]);
-        int heightSize = Integer.parseInt(inputSplit[2]);
-        int rotate = Integer.parseInt(inputSplit[3]);
-        double outputQuality = Double.parseDouble(inputSplit[4]);
+    static int widthSize, heightSize, rotate;
+    static double outputQuality;
+    static BufferedImage image;
+    static {
+        try{
+            widthSize = Integer.parseInt(System.getenv("width_size"));
+            heightSize = Integer.parseInt(System.getenv("height_size"));
+            rotate = Integer.parseInt(System.getenv("rotate"));
+            outputQuality = Double.parseDouble(System.getenv("output_quality"));
 
+            URL url = new URL(System.getenv("image_url"));
+            image = ImageIO.read(url);
+
+        } catch(Exception e) {
+            System.err.println(e.getMessage());
+        }
+    }
+
+    public String callFunction() {
         String err = "";
         try {
-            Thumbnails.of(new URL(url))
-                .size(widthSize, heightSize)
-                .rotate(rotate)
-                .outputQuality(outputQuality)
-                .toFile("thumbnail.jpg");
+            Thumbnails.of(this.image)
+                .size(this.widthSize, this.heightSize)
+                .rotate(this.rotate)
+                .outputQuality(this.outputQuality)
+                .asBufferedImage();
         } catch (Exception e) {
             err = e.getMessage();
         }
+
         return err;
     }
 

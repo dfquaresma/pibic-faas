@@ -6,3 +6,9 @@ functions:
     lang: java8
     handler: ./thumbnailator
     image: dfquaresma/thumbnailator:latest
+    environment:
+        image_url: https://link-italia.org/images/top-full-world-map-9.jpg
+        width_size: 1152
+        height_size: 650
+        rotate: 270
+        output_quality: 0.7
