@@ -7,8 +7,8 @@ functions:
     handler: ./thumbnailator
     image: dfquaresma/thumbnailator:latest
     environment:
-        image_url: "https://blog.alexellis.io/content/images/2017/08/faas_side.png"
-        width_size: 480
-        height_size: 300
+        image_url: https://link-italia.org/images/top-full-world-map-9.jpg
+        width_size: 1152
+        height_size: 650
         rotate: 180
         output_quality: 0.8
