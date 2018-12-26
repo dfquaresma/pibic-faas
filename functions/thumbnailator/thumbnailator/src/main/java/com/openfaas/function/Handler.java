@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.ArrayList;
 
 import net.coobird.thumbnailator.Thumbnails;
+import net.coobird.thumbnailator.Thumbnails.Builder;
 import java.net.URL;
 
 public class Handler implements com.openfaas.model.IHandler {
@@ -53,30 +54,32 @@ public class Handler implements com.openfaas.model.IHandler {
         return res;
     }
 
-    static URL image;
+    static int widthSize, heightSize, rotate;
+    static double outputQuality;
+    static URL url;
     static {
         try{
-            image = new URL(System.getenv("image_url"));
-        }catch(Exception e) {
+            widthSize = Integer.parseInt(System.getenv("width_size"));
+            heightSize = Integer.parseInt(System.getenv("height_size"));
+            rotate = Integer.parseInt(System.getenv("rotate"));
+            outputQuality = Double.parseDouble(System.getenv("output_quality"));
+            url = new URL(System.getenv("image_url"));
+        } catch(Exception e) {
             System.err.println(e.getMessage());
         }
     }
 
     public String callFunction() {
-        int widthSize = Integer.parseInt(System.getenv("width_size"));
-        int heightSize = Integer.parseInt(System.getenv("height_size"));
-        int rotate = Integer.parseInt(System.getenv("rotate"));
-        double outputQuality = Double.parseDouble(System.getenv("output_quality"));
-
         String err = "";
         try {
-            Thumbnails.of(image)
+            Thumbnails.of(url)
                 .size(widthSize, heightSize)
                 .rotate(rotate)
                 .outputQuality(outputQuality);
         } catch (Exception e) {
             err = e.getMessage();
         }
+
         return err;
     }
 
