@@ -13,6 +13,8 @@ import java.util.ArrayList;
 
 import net.coobird.thumbnailator.Thumbnails;
 import java.net.URL;
+import java.awt.image.BufferedImage;
+import javax.imageio.ImageIO;
 
 public class Handler implements com.openfaas.model.IHandler {
 
@@ -53,16 +55,19 @@ public class Handler implements com.openfaas.model.IHandler {
         return res;
     }
 
-    static URL url;
     static int widthSize, heightSize, rotate;
     static double outputQuality;
+    static BufferedImage image;
     static {
         try{
-            url = new URL(System.getenv("image_url"));
             widthSize = Integer.parseInt(System.getenv("width_size"));
             heightSize = Integer.parseInt(System.getenv("height_size"));
             rotate = Integer.parseInt(System.getenv("rotate"));
             outputQuality = Double.parseDouble(System.getenv("output_quality"));
+
+            URL url = new URL(System.getenv("image_url"));
+            image = ImageIO.read(url);
+
         } catch(Exception e) {
             System.err.println(e.getMessage());
         }
@@ -71,11 +76,11 @@ public class Handler implements com.openfaas.model.IHandler {
     public String callFunction() {
         String err = "";
         try {
-            Thumbnails.of(this.url)
+            Thumbnails.of(this.image)
                 .size(this.widthSize, this.heightSize)
                 .rotate(this.rotate)
                 .outputQuality(this.outputQuality)
-                .toFile("thumbnail.jpg");
+                .asBufferedImage();
         } catch (Exception e) {
             err = e.getMessage();
         }
