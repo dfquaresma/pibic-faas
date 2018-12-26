@@ -67,8 +67,7 @@ public class Handler implements com.openfaas.model.IHandler {
             Thumbnails.of(new URL(url))
                 .size(widthSize, heightSize)
                 .rotate(rotate)
-                .outputQuality(outputQuality)
-                .toFile("thumbnail.jpg");
+                .outputQuality(outputQuality);
         } catch (Exception e) {
             err = e.getMessage();
         }
