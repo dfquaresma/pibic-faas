@@ -6,3 +6,5 @@ functions:
     lang: java8
     handler: ./thumbnailator
     image: dfquaresma/thumbnailator:latest
+    environment:
+        image_url: "https://blog.alexellis.io/content/images/2017/08/faas_side.png"
