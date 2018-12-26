@@ -27,7 +27,7 @@ public class Handler implements com.openfaas.model.IHandler {
         long timeBeforeMarkSweep = markSweep.getCollectionTime();
         long before = System.currentTimeMillis();
 
-        String err = callFunction(req.getBody());
+        String err = callFunction();
 
         long after = System.currentTimeMillis();
         long countAfterScavenge = scavenge.getCollectionCount();
@@ -62,14 +62,11 @@ public class Handler implements com.openfaas.model.IHandler {
         }
     }
 
-    public String callFunction(String input) {
-        String[] inputSplit = input.split(" ");
-        
-        String url = inputSplit[0];
-        int widthSize = Integer.parseInt(inputSplit[1]);
-        int heightSize = Integer.parseInt(inputSplit[2]);
-        int rotate = Integer.parseInt(inputSplit[3]);
-        double outputQuality = Double.parseDouble(inputSplit[4]);
+    public String callFunction() {
+        int widthSize = Integer.parseInt(System.getenv("width_size"));
+        int heightSize = Integer.parseInt(System.getenv("height_size"));
+        int rotate = Integer.parseInt(System.getenv("rotate"));
+        double outputQuality = Double.parseDouble(System.getenv("output_quality"));
 
         String err = "";
         try {
