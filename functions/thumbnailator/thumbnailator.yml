@@ -7,8 +7,8 @@ functions:
     handler: ./thumbnailator
     image: dfquaresma/thumbnailator:latest
     environment:
-        image_url: https://camo.githubusercontent.com/cf01eefb5b6905f3774376d6d1ed55b8f052d211/68747470733a2f2f626c6f672e616c6578656c6c69732e696f2f636f6e74656e742f696d616765732f323031372f30382f666161735f736964652e706e67
-        width_size: 452
-        height_size: 105
-        rotate: 180
-        output_quality: 0.8
+        image_url: https://link-italia.org/images/top-full-world-map-9.jpg
+        width_size: 1152
+        height_size: 650
+        rotate: 270
+        output_quality: 0.7
