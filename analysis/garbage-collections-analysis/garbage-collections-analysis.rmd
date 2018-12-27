@@ -18,12 +18,12 @@ Os resultados analisados neste documento foram obtidos através da execução de
 - Utilização do of-watchdog (versão que aproveita a runtime).
 
 #### Experimento
-- Execução de 20.000 requisições.
+- Execução de 5.000 requisições.
 - Execução sequencial das chamadas à função.
 
 #### Função 
 - Linguagem: java8
-- Lógica de negócio: adiciona 2 ^ 21 (2097152) elemento em um array list.
+- Lógica de negócio: Redimencionamento de uma imagem de 11527x6505 pixels para 1152x650 pixels. 
 - Contabiliza quantas coletas houveram durante a execução da lógica de negócio.
 - Contabiliza a duração das coletas que aconteceram durante a execução da lógica de negócio.
 - Contabiliza o tempo total de execução da lógica de negócio.
@@ -31,8 +31,8 @@ Os resultados analisados neste documento foram obtidos através da execução de
 # Resultados
 ### Plot
 ```{r}
-results = read.csv("../curl-workload/business-logic-results/r0.csv", header=T, dec=".")
-plot(results$business_time.ms., results$scavenge_count + results$marksweep_count, xlim=c(0,750), xlab="tempo de execução (ms)", ylab="numero de coletas")
+results = read.csv("../curl-workload/thumbnailator/r0.csv", header=T, dec=".")
+plot(results$business_time.ms., results$scavenge_count + results$marksweep_count, xlab="tempo de execução (ms)", ylab="numero de coletas")
 ```
 
 
@@ -48,41 +48,42 @@ cor(results$business_time.ms., results$marksweep_count)
 #### Não Ocorreu Coleta
 ```{r}
 nocollect <- filter(results, scavenge_count + marksweep_count == 0)
-quantile(nocollect$business_time.ms., c(.0, .25, .50, .75, .90, .99, .999))
+qNoCollect = quantile(nocollect$business_time.ms., c(.0, .25, .50, .75, .90, .99, .999))
+qNoCollect
 ```
 
 #### Ocorreu Coleta
 ```{r}
 withcollect <- filter(results, scavenge_count + marksweep_count > 0)
-quantile(withcollect$business_time.ms., c(.0, .25, .50, .75, .90, .99, .999))
+qWithCollect = quantile(withcollect$business_time.ms., c(.0, .25, .50, .75, .90, .99, .999))
+qWithCollect
 ```
 
+#### Comparação
+```{r}
+qWithCollect / qNoCollect
+```
 
 ### Boxplot
-#### Não Ocorreu Coleta
 ```{r}
-boxplot(nocollect$business_time.ms., outline=FALSE)
-```
-
-#### Ocorreu Coleta
-```{r}
-boxplot(withcollect$business_time.ms., outline=FALSE)
+boxplot(nocollect$business_time.ms., withcollect$business_time.ms., names=c("Não Ocorreu Coleta", "Ocorreu Coleta"), main="Impacto do Coletor", outline=FALSE)
 ```
 
 
 ### Média, Variância e Desvio Padrão 
-#### Não Ocorreu Coleta
 ```{r}
-mean(nocollect$business_time.ms.)
-var(nocollect$business_time.ms.)
-sd(nocollect$business_time.ms.)
-```
+meanNoCollect = mean(nocollect$business_time.ms.)
+varNoCollect = var(nocollect$business_time.ms.)
+sdNoCollect = sd(nocollect$business_time.ms.)
 
-#### Ocorreu Coleta
-```{r}
-mean(withcollect$business_time.ms.)
-var(withcollect$business_time.ms.)
-sd(withcollect$business_time.ms.)
-```
+meanWithCollect = mean(withcollect$business_time.ms.)
+varWithCollect = var(withcollect$business_time.ms.)
+sdWithCollect = sd(withcollect$business_time.ms.)
 
+data.frame(
+  statistic = c("mean", "var", "sd"), 
+  noCollect = c(meanNoCollect, varNoCollect, sdNoCollect), 
+  withCollect = c(meanWithCollect, varWithCollect, sdWithCollect),
+  comparison = c(meanWithCollect / meanNoCollect, varWithCollect / varNoCollect, sdWithCollect / sdNoCollect))
+```
 
