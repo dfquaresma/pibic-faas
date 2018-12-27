@@ -31,8 +31,8 @@ Os resultados analisados neste documento foram obtidos através da execução de
 # Resultados
 ### Plot
 ```{r}
-results = read.csv("../curl-workload/business-logic-results/r0.csv", header=T, dec=".")
-plot(results$business_time.ms., results$scavenge_count + results$marksweep_count, xlim=c(0,750), xlab="tempo de execução (ms)", ylab="numero de coletas")
+results = read.csv("../curl-workload/thumbnailator/r0.csv", header=T, dec=".")
+plot(results$business_time.ms., results$scavenge_count + results$marksweep_count, xlab="tempo de execução (ms)", ylab="numero de coletas")
 ```
 
 
@@ -59,30 +59,24 @@ quantile(withcollect$business_time.ms., c(.0, .25, .50, .75, .90, .99, .999))
 
 
 ### Boxplot
-#### Não Ocorreu Coleta
 ```{r}
-boxplot(nocollect$business_time.ms., outline=FALSE)
-```
-
-#### Ocorreu Coleta
-```{r}
-boxplot(withcollect$business_time.ms., outline=FALSE)
+boxplot(nocollect$business_time.ms., withcollect$business_time.ms., names=c("Não Ocorreu Coleta", "Ocorreu Coleta"), main="Impacto do Coletor", outline=FALSE)
 ```
 
 
 ### Média, Variância e Desvio Padrão 
-#### Não Ocorreu Coleta
 ```{r}
-mean(nocollect$business_time.ms.)
-var(nocollect$business_time.ms.)
-sd(nocollect$business_time.ms.)
+meanNoCollect = mean(nocollect$business_time.ms.)
+varNoCollect = var(nocollect$business_time.ms.)
+sdNoCollect = sd(nocollect$business_time.ms.)
+
+meanWithCollect = mean(withcollect$business_time.ms.)
+varWithCollect = var(withcollect$business_time.ms.)
+sdWithCollect = sd(withcollect$business_time.ms.)
+
+data.frame(
+  statistic = c("mean", "var", "sd"), 
+  noCollect = c(meanNoCollect, varNoCollect, sdNoCollect), 
+  withCollect = c(meanWithCollect, varWithCollect, sdWithCollect),
+  comparison = c(meanWithCollect / meanNoCollect, varWithCollect / varNoCollect, sdWithCollect / sdNoCollect))
 ```
-
-#### Ocorreu Coleta
-```{r}
-mean(withcollect$business_time.ms.)
-var(withcollect$business_time.ms.)
-sd(withcollect$business_time.ms.)
-```
-
-
