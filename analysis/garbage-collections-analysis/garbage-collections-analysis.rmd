@@ -18,12 +18,12 @@ Os resultados analisados neste documento foram obtidos através da execução de
 - Utilização do of-watchdog (versão que aproveita a runtime).
 
 #### Experimento
-- Execução de 10.000 requisições.
+- Execução de 1000 requisições.
 - Execução sequencial das chamadas à função.
 
 #### Função 
 - Linguagem: java8
-- Lógica de negócio: Redimencionamento de uma imagem de 1920x1080 pixels para 192x108 pixels. 
+- Lógica de negócio: Redimencionamento de uma imagem de 13240x5547 pixels para 1324x554 pixels. 
 - Contabiliza quantas coletas houveram durante a execução da lógica de negócio.
 - Contabiliza a duração das coletas que aconteceram durante a execução da lógica de negócio.
 - Contabiliza o tempo total de execução da lógica de negócio.
