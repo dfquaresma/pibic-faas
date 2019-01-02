@@ -7,8 +7,8 @@ functions:
     handler: ./thumbnailator
     image: dfquaresma/thumbnailator:latest
     environment:
-        image_url: https://link-italia.org/images/top-full-world-map-9.jpg
-        width_size: 1152
-        height_size: 650
+        image_url: http://s3.amazonaws.com/wallpapers2/wallpapers/images/000/000/408/original/375.jpg?1487671636
+        width_size: 1324
+        height_size: 554
         rotate: 270
-        output_quality: 0.7
+        output_quality: 1
