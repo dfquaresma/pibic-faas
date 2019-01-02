@@ -18,12 +18,12 @@ Os resultados analisados neste documento foram obtidos através da execução de
 - Utilização do of-watchdog (versão que aproveita a runtime).
 
 #### Experimento
-- Execução de 5.000 requisições.
+- Execução de 10.000 requisições.
 - Execução sequencial das chamadas à função.
 
 #### Função 
 - Linguagem: java8
-- Lógica de negócio: Redimencionamento de uma imagem de 11527x6505 pixels para 1152x650 pixels. 
+- Lógica de negócio: Redimencionamento de uma imagem de 1920x1080 pixels para 192x108 pixels. 
 - Contabiliza quantas coletas houveram durante a execução da lógica de negócio.
 - Contabiliza a duração das coletas que aconteceram durante a execução da lógica de negócio.
 - Contabiliza o tempo total de execução da lógica de negócio.
@@ -31,7 +31,7 @@ Os resultados analisados neste documento foram obtidos através da execução de
 # Resultados
 ### Plot
 ```{r}
-results = read.csv("../curl-workload/thumbnailator/r0.csv", header=T, dec=".")
+results = read.csv("../curl-workload/thumbnailator-results/r0.csv", header=T, dec=".")
 plot(results$business_time.ms., results$scavenge_count + results$marksweep_count, xlab="tempo de execução (ms)", ylab="numero de coletas")
 ```
 
