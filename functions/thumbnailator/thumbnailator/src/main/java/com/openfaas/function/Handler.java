@@ -56,7 +56,7 @@ public class Handler implements com.openfaas.model.IHandler {
     }
 
     static int widthSize, heightSize, rotate;
-    static double outputQuality;
+    static double outputQuality, scaleSize;
     static BufferedImage image;
     static {
         try{
@@ -64,7 +64,7 @@ public class Handler implements com.openfaas.model.IHandler {
             heightSize = Integer.parseInt(System.getenv("height_size"));
             rotate = Integer.parseInt(System.getenv("rotate"));
             outputQuality = Double.parseDouble(System.getenv("output_quality"));
-
+            scaleSize = Double.parseDouble(System.getenv("scale_size"));
             URL url = new URL(System.getenv("image_url"));
             image = ImageIO.read(url);
 
@@ -77,7 +77,7 @@ public class Handler implements com.openfaas.model.IHandler {
         String err = "";
         try {
             Thumbnails.of(this.image)
-                .size(this.widthSize, this.heightSize)
+                .scale(this.scaleSize)
                 .rotate(this.rotate)
                 .outputQuality(this.outputQuality)
                 .asBufferedImage();

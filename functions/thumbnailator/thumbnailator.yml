@@ -12,3 +12,4 @@ functions:
         height_size: 554
         rotate: 270
         output_quality: 1
+        scale_size: 0.1
