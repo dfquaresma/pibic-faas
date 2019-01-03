@@ -55,13 +55,11 @@ public class Handler implements com.openfaas.model.IHandler {
         return res;
     }
 
-    static int widthSize, heightSize, rotate;
+    static int rotate;
     static double outputQuality, scaleSize;
     static BufferedImage image;
     static {
         try{
-            widthSize = Integer.parseInt(System.getenv("width_size"));
-            heightSize = Integer.parseInt(System.getenv("height_size"));
             rotate = Integer.parseInt(System.getenv("rotate"));
             outputQuality = Double.parseDouble(System.getenv("output_quality"));
             scaleSize = Double.parseDouble(System.getenv("scale_size"));
