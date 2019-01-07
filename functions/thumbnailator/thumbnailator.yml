@@ -2,7 +2,7 @@ provider:
   name: faas
   gateway: http://127.0.0.1:8080
 functions:
-  thumbnailator:
+  thumbnailator-11mb:
     lang: java8
     handler: ./thumbnailator
     image: dfquaresma/thumbnailator:latest
@@ -11,3 +11,24 @@ functions:
         rotate: 270
         output_quality: 1
         scale_size: 0.1
+
+  thumbnailator-1mb:
+    lang: java8
+    handler: ./thumbnailator
+    image: dfquaresma/thumbnailator:latest
+    environment:
+        image_url: "https://i.imgur.com/BhlDUOR.jpg"
+        rotate: 270
+        output_quality: 1
+        scale_size: 0.1
+ 
+  thumbnailator-131kb:
+    lang: java8
+    handler: ./thumbnailator
+    image: dfquaresma/thumbnailator:latest
+    environment:
+        image_url: "http://s3.amazonaws.com/wallpapers2/wallpapers/images/000/000/408/thumb/375.jpg?1487671636"
+        rotate: 270
+        output_quality: 1
+        scale_size: 0.1
+
