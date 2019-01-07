@@ -31,7 +31,7 @@ Os resultados analisados neste documento foram obtidos através da execução de
 # Resultados
 ### Plot
 ```{r}
-results = read.csv("../curl-workload/thumbnailator-results/r0.csv", header=T, dec=".")
+results = read.csv("../curl-workload/thumbnailator-results/r11mb.csv", header=T, dec=".")
 results = tail(results, -100)
 plot(results$business_time.ms., results$scavenge_count + results$marksweep_count, xlab="tempo de execução (ms)", ylab="numero de coletas", main="Impacto do Coletor (Geral)")
 ```
@@ -74,7 +74,7 @@ boxplot(nocollect$business_time.ms., withMarksweep$business_time.ms., names=c("N
 ### Quantiles
 ```{r}
 qCollect = function(data) {
-  quantile(data$business_time.ms., c(.0, .25, .50, .75, .90, .99, .999))
+  quantile(data$business_time.ms., c(.0, .25, .50, .75, .90, .99, .999, .9999))
 }
 ```
 
