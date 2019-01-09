@@ -8,27 +8,33 @@ functions:
     image: dfquaresma/thumbnailator:latest
     environment:
         image_url: http://s3.amazonaws.com/wallpapers2/wallpapers/images/000/000/408/original/375.jpg?1487671636
-        rotate: 270
+        watermark_url: http://www.ufcg.edu.br/prt_ufcg/scripts_php/lista_noticias/image001.jpg
+        rotate: 0
         output_quality: 1
-        scale_size: 0.1
+        scale: 0.1
+        transparency: 0.3f
 
   thumbnailator-1mb:
     lang: java8
     handler: ./thumbnailator
     image: dfquaresma/thumbnailator:latest
     environment:
-        image_url: "https://i.imgur.com/BhlDUOR.jpg"
-        rotate: 270
+        image_url: https://i.imgur.com/BhlDUOR.jpg
+        watermark_url: http://www.ufcg.edu.br/prt_ufcg/scripts_php/lista_noticias/image001.jpg
+        rotate: 0
         output_quality: 1
-        scale_size: 0.1
+        scale: 0.1
+        transparency: 0.3f
  
   thumbnailator-131kb:
     lang: java8
     handler: ./thumbnailator
     image: dfquaresma/thumbnailator:latest
     environment:
-        image_url: "http://s3.amazonaws.com/wallpapers2/wallpapers/images/000/000/408/thumb/375.jpg?1487671636"
-        rotate: 270
+        image_url: http://s3.amazonaws.com/wallpapers2/wallpapers/images/000/000/408/thumb/375.jpg?1487671636
+        watermark_url: http://www.ufcg.edu.br/prt_ufcg/scripts_php/lista_noticias/image001.jpg
+        rotate: 0
         output_quality: 1
-        scale_size: 0.1
+        scale: 1
+        transparency: 0.3f
 
