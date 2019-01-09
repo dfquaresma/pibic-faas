@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.ArrayList;
 
 import net.coobird.thumbnailator.Thumbnails;
+import net.coobird.thumbnailator.geometry.Positions;
 import java.net.URL;
 import java.awt.image.BufferedImage;
 import javax.imageio.ImageIO;
@@ -56,15 +57,20 @@ public class Handler implements com.openfaas.model.IHandler {
     }
 
     static int rotate;
-    static double outputQuality, scaleSize;
-    static BufferedImage image;
+    static double outputQuality, scale;
+    static float transparency;
+    static BufferedImage image, watermark;
     static {
         try{
             rotate = Integer.parseInt(System.getenv("rotate"));
             outputQuality = Double.parseDouble(System.getenv("output_quality"));
-            scaleSize = Double.parseDouble(System.getenv("scale_size"));
-            URL url = new URL(System.getenv("image_url"));
-            image = ImageIO.read(url);
+            scale = Double.parseDouble(System.getenv("scale"));
+            transparency = Float.parseFloat(System.getenv("transparency"));
+
+            URL imageUrl = new URL(System.getenv("image_url"));
+            URL watermarkUrl = new URL(System.getenv("watermark_url"));
+            image = ImageIO.read(imageUrl);
+            watermark = ImageIO.read(watermarkUrl);
 
         } catch(Exception e) {
             System.err.println(e.getMessage());
@@ -75,10 +81,12 @@ public class Handler implements com.openfaas.model.IHandler {
         String err = "";
         try {
             Thumbnails.of(this.image)
-                .scale(this.scaleSize)
+                .scale(this.scale)
                 .rotate(this.rotate)
+                .watermark(Positions.BOTTOM_RIGHT, this.watermark, this.transparency)
                 .outputQuality(this.outputQuality)
                 .asBufferedImage();
+            
         } catch (Exception e) {
             err = e.getMessage();
         }
