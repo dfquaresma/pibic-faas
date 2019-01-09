@@ -10,7 +10,7 @@ require(dplyr)
 ```
 
 # Introdução
-Os resultados analisados neste documento foram obtidos através da execução de múltiplas chamadas de uma mesma função de modo sequencial, isto é, não concorrente. Para tal, utilizamos o script [curl-workload](https://github.com/dfquaresma/pibic-faas/blob/master/analysis/curl-workload/curl-workload.sh) para gerar carga e observar o impacto do coletor de lixo na função [business-logic-csv](https://github.com/dfquaresma/pibic-faas/blob/master/functions/business-logic/business-logic-csv/business-logic-csv/src/main/java/com/openfaas/function/Handler.java).   
+Os resultados analisados neste documento foram obtidos através da execução de múltiplas chamadas de uma mesma função de modo sequencial, isto é, não concorrente. Para tal, utilizamos o script [curl-workload](https://github.com/dfquaresma/pibic-faas/blob/master/analysis/curl-workload/curl-workload.sh) para gerar carga e observar o impacto do coletor de lixo na função [thumbnailator](https://github.com/dfquaresma/pibic-faas/blob/master/functions/thumbnailator/thumbnailator/src/main/java/com/openfaas/function/Handler.java).   
 
 # Setup
 #### Gerais
@@ -23,7 +23,7 @@ Os resultados analisados neste documento foram obtidos através da execução de
 
 #### Função 
 - Linguagem: java8
-- Lógica de negócio: Redimencionamento de uma imagem de 13240x5547 pixels para 1324x554 pixels. 
+- Lógica de negócio: Redimencionamento, rotação, adição de marca d'água e atualização de qualidade de uma imagem.
 - Contabiliza quantas coletas houveram durante a execução da lógica de negócio.
 - Contabiliza a duração das coletas que aconteceram durante a execução da lógica de negócio.
 - Contabiliza o tempo total de execução da lógica de negócio.
@@ -31,7 +31,7 @@ Os resultados analisados neste documento foram obtidos através da execução de
 # Resultados
 ### Plot
 ```{r}
-results = read.csv("../curl-workload/thumbnailator-results/r11mb.csv", header=T, dec=".")
+results = read.csv("../curl-workload/thumbnailator-results/131kb-rwm0.csv", header=T, dec=".")
 results = tail(results, -100)
 plot(results$business_time.ms., results$scavenge_count + results$marksweep_count, xlab="tempo de execução (ms)", ylab="numero de coletas", main="Impacto do Coletor (Geral)")
 ```
@@ -51,6 +51,8 @@ cor(results$business_time.ms., results$scavenge_count)
 cor(results$business_time.ms., results$marksweep_count)
 ```
 
+Como não houve coleta Marksweep, as análises voltadas para o Marksweep foram comprometidas.
+
 ### Boxplot Geral
 ```{r}
 nocollect <- filter(results, scavenge_count + marksweep_count == 0)
@@ -64,12 +66,15 @@ withScavenge <- filter(results, scavenge_count > 0 & marksweep_count == 0)
 boxplot(nocollect$business_time.ms., withScavenge$business_time.ms., names=c("Não Ocorreu Coleta", "Ocorreu Coleta"), main="Impacto do Coletor (Scavenge)", outline=FALSE)
 ```
 
+
+
 ### Boxplot Marksweep
 ```{r}
 withMarksweep <- filter(results, marksweep_count > 0 & scavenge_count == 0)
 boxplot(nocollect$business_time.ms., withMarksweep$business_time.ms., names=c("Não Ocorreu Coleta", "Ocorreu Coleta"), main="Impacto do Coletor (Marksweep)", outline=FALSE)
 ```
 
+Como não houve coleta Marksweep isolada (sem ter ocorrido também coleta Scavenge), as análises voltadas apenas para o Marksweep foram comprometidas.
 
 ### Quantiles
 ```{r}
