@@ -56,19 +56,15 @@ public class Handler implements com.openfaas.model.IHandler {
         return res;
     }
 
-    static int rotate;
-    static double outputQuality, scale;
-    static float transparency;
+    final int rotate = 0;
+    final double outputQuality = 1.0;
+    final double  scale = 0.1;
+    final float transparency = 0.3f;
     static BufferedImage image, watermark;
     static {
         try{
-            rotate = Integer.parseInt(System.getenv("rotate"));
-            outputQuality = Double.parseDouble(System.getenv("output_quality"));
-            scale = Double.parseDouble(System.getenv("scale"));
-            transparency = Float.parseFloat(System.getenv("transparency"));
-
-            URL imageUrl = new URL(System.getenv("image_url"));
-            URL watermarkUrl = new URL(System.getenv("watermark_url"));
+            URL imageUrl = new URL("https://i.imgur.com/BhlDUOR.jpg");
+            URL watermarkUrl = new URL("http://www.ufcg.edu.br/prt_ufcg/scripts_php/lista_noticias/image001.jpg");
             image = ImageIO.read(imageUrl);
             watermark = ImageIO.read(watermarkUrl);
 
