@@ -10,7 +10,7 @@ require(dplyr)
 ```
 
 # Introdução
-Os resultados analisados neste documento foram obtidos através da execução de múltiplas chamadas de uma mesma função de modo sequencial, isto é, não concorrente. Para tal, utilizamos o script [curl-workload](https://github.com/dfquaresma/pibic-faas/blob/master/analysis/curl-workload/curl-workload.sh) para gerar carga e observar o impacto do coletor de lixo na função [thumbnailator](https://github.com/dfquaresma/pibic-faas/blob/master/functions/thumbnailator/thumbnailator/src/main/java/com/openfaas/function/Handler.java).   
+Os resultados analisados neste documento foram obtidos através da execução de múltiplas chamadas de uma mesma função de modo sequencial, isto é, não concorrente. Para tal, utilizamos o script [curl-workload](https://github.com/dfquaresma/pibic-faas/blob/master/analysis/curl-workload.sh) para gerar carga e observar o impacto do coletor de lixo na função [thumbnailator](https://github.com/dfquaresma/pibic-faas/blob/master/functions/thumbnailator/thumbnailator/src/main/java/com/openfaas/function/Handler.java).   
 
 # Setup
 #### Gerais
