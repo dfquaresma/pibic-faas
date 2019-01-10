@@ -18,16 +18,20 @@ import com.thumbnailator.model.*;
 public class App {
 
     public static void main(String[] args) throws Exception {
-        int port = 8080;
+        int port = 9000;
 
         IHandler handler = new com.thumbnailator.function.Handler();
 
-        HttpServer server = HttpServer.create(new InetSocketAddress(port), 0);
+        InetSocketAddress addr = new InetSocketAddress(port);
+        HttpServer server = HttpServer.create(addr, 0);
         InvokeHandler invokeHandler = new InvokeHandler(handler);
 
         server.createContext("/", invokeHandler);
         server.setExecutor(null); // creates a default executor
         server.start();
+    	
+        System.out.println("SERVER STARTED!");
+        System.out.println("LISTENING TO:" + server.getAddress());
     }
 
     static class InvokeHandler implements HttpHandler {
