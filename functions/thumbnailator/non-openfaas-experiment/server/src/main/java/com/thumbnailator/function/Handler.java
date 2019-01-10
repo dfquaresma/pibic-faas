@@ -9,6 +9,7 @@ import java.lang.management.GarbageCollectorMXBean;
 import java.lang.management.ManagementFactory;
 
 import java.util.List;
+import java.lang.Error;
 
 import net.coobird.thumbnailator.Thumbnails;
 import java.net.URL;
@@ -39,7 +40,7 @@ public class Handler implements com.thumbnailator.model.IHandler {
         String processName = java.lang.management.ManagementFactory.getRuntimeMXBean().getName();
         long pid = Long.parseLong(processName.split("@")[0]);
 
-        String output = err;
+        String output = err + System.lineSeparator();
         if (err.length() == 0) {
             output = Long.toString(pid) + "," + // Pid
                 Long.toString(after - before) + "," + // Business Logic Time in Milliseconds
@@ -72,14 +73,25 @@ public class Handler implements com.thumbnailator.model.IHandler {
     public String callFunction() {
         String err = "";
         try {
-            Thumbnails.of(this.image)
-                .scale(this.scale)
-                .rotate(this.rotate)
-                .outputQuality(this.outputQuality)
+        	System.out.println("DEBUG: Before Thumb");
+            Thumbnails.of(image)
+                .scale(scale)
+                .rotate(rotate)
+                .outputQuality(outputQuality)
                 .asBufferedImage();
+        	System.out.println("DEBUG: After Thumb");
             
         } catch (Exception e) {
-            err = e.getMessage();
+            err = e.toString() + System.lineSeparator()
+            		+ e.getCause() + System.lineSeparator()
+            		+ e.getMessage();
+            System.out.println("DEBUG: Exception in Thumb");
+            
+        } catch (Error e) {
+            err = e.toString() + System.lineSeparator()
+            		+ e.getCause() + System.lineSeparator()
+            		+ e.getMessage();
+            System.out.println("DEBUG: Error in Thumb");
         }
 
         return err;
