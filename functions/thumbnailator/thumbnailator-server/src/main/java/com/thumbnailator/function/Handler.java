@@ -9,6 +9,7 @@ import java.lang.management.GarbageCollectorMXBean;
 import java.lang.management.ManagementFactory;
 
 import java.util.List;
+import java.util.ArrayList;
 import java.lang.Error;
 
 import net.coobird.thumbnailator.Thumbnails;
@@ -74,11 +75,13 @@ public class Handler implements com.thumbnailator.model.IHandler {
         String err = "";
         try {
         	System.out.println("DEBUG: Before Thumb");
-            Thumbnails.of(image)
+            /*
+        	Thumbnails.of(image)
                 .scale(scale)
                 .rotate(rotate)
                 .outputQuality(outputQuality)
                 .asBufferedImage();
+        	*/
         	System.out.println("DEBUG: After Thumb");
             
         } catch (Exception e) {
