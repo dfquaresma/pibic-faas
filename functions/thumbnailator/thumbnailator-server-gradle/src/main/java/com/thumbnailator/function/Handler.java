@@ -84,11 +84,13 @@ public class Handler implements com.thumbnailator.model.IHandler {
             err = e.toString() + System.lineSeparator()
             		+ e.getCause() + System.lineSeparator()
             		+ e.getMessage();
-            
+            e.printStackTrace();
+
         } catch (Error e) {
             err = e.toString() + System.lineSeparator()
             		+ e.getCause() + System.lineSeparator()
             		+ e.getMessage();
+            e.printStackTrace();
         }
 
         return err;
