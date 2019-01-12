@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="src" path="src/main/java"/>
+	<classpathentry kind="src" path="src/test/java"/>
+	<classpathentry kind="lib" path="gradle/wrapper/gradle-wrapper.jar"/>
+	<classpathentry kind="lib" path="/home/davidfq/.m2/repository/net/coobird/thumbnailator/0.4.8/thumbnailator-0.4.8.jar" sourcepath="/home/davidfq/.m2/repository/net/coobird/thumbnailator/0.4.8/thumbnailator-0.4.8-sources.jar">
+		<attributes>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.groupId" value="net.coobird"/>
+			<attribute name="maven.artifactId" value="thumbnailator"/>
+			<attribute name="maven.version" value="0.4.8"/>
+			<attribute name="maven.scope" value="compile"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
