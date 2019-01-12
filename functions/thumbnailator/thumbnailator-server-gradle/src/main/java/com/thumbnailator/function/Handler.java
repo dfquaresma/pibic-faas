@@ -74,25 +74,21 @@ public class Handler implements com.thumbnailator.model.IHandler {
     public String callFunction() {
         String err = "";
         try {
-        	System.out.println("DEBUG: Before Thumb");
             Thumbnails.of(image)
                 .scale(scale)
                 .rotate(rotate)
                 .outputQuality(outputQuality)
                 .asBufferedImage();
-        	System.out.println("DEBUG: After Thumb");
             
         } catch (Exception e) {
             err = e.toString() + System.lineSeparator()
             		+ e.getCause() + System.lineSeparator()
             		+ e.getMessage();
-            System.out.println("DEBUG: Exception in Thumb");
             
         } catch (Error e) {
             err = e.toString() + System.lineSeparator()
             		+ e.getCause() + System.lineSeparator()
             		+ e.getMessage();
-            System.out.println("DEBUG: Error in Thumb");
         }
 
         return err;
