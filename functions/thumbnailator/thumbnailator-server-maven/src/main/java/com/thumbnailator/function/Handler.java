@@ -75,13 +75,11 @@ public class Handler implements com.thumbnailator.model.IHandler {
         String err = "";
         try {
         	System.out.println("DEBUG: Before Thumb");
-            /*
-        	Thumbnails.of(image)
+            Thumbnails.of(image)
                 .scale(scale)
                 .rotate(rotate)
                 .outputQuality(outputQuality)
                 .asBufferedImage();
-        	*/
         	System.out.println("DEBUG: After Thumb");
             
         } catch (Exception e) {
