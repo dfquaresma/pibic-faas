@@ -56,13 +56,10 @@ public class Handler implements com.thumbnailator.model.IHandler {
         return res;
     }
 
-    static int rotate;
-    static double outputQuality, scale;
+    static double scale;
     static BufferedImage image;
     static {
         try{
-            rotate = Integer.parseInt(System.getenv("rotate"));
-            outputQuality = Double.parseDouble(System.getenv("output_quality"));
             scale = Double.parseDouble(System.getenv("scale"));
             image = ImageIO.read(new URL(System.getenv("image_url")));
 
@@ -76,8 +73,6 @@ public class Handler implements com.thumbnailator.model.IHandler {
         try {
             Thumbnails.of(image)
                 .scale(scale)
-                .rotate(rotate)
-                .outputQuality(outputQuality)
                 .asBufferedImage();
         	
         } catch (Exception e) {
