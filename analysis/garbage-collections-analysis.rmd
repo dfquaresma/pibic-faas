@@ -36,7 +36,7 @@ Os resultados analisados neste documento foram obtidos através da execução de
 ```{r}
 results = read.csv("./thumbnailator-server-results/h512-s10-i131kb-r10k.csv", header=T, dec=".")
 results = tail(results, -100)
-plot(results$business_time.ms., results$scavenge_time + results$marksweep_time, xlab="tempo de execução (ms)", ylab="numero de coletas", main="Tempo de Execução X Duração das Coletas")
+plot(results$business_time.ms., results$scavenge_time + results$marksweep_time, xlab="tempo de execução (ms)", ylab="duração das coletas", main="Tempo de Execução X Duração das Coletas")
 ```
 
 ### Número de coletas
@@ -65,7 +65,7 @@ cor(results$business_time.ms., results$scavenge_time)
 ```{r}
 nocollect <- filter(results, scavenge_count + marksweep_count == 0)
 withcollect <- filter(results, scavenge_count + marksweep_count > 0)
-boxplot(nocollect$business_time.ms., withcollect$business_time.ms., names=c("Não Ocorreu Coleta", "Ocorreu Coleta"), main="Impacto do Coletor (Geral)", outline=FALSE)
+boxplot(nocollect$business_time.ms., withcollect$business_time.ms., names=c("Não Ocorreu Coleta", "Ocorreu Coleta"), main="Não Ocorreu X Ocorreu", outline=FALSE)
 ```
 
 ### Quantiles
