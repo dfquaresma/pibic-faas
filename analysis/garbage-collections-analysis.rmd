@@ -1,7 +1,7 @@
 ---
 title: "Garbage Collector Impact"
 author: "David Ferreira Quaresma (david.quaresma@ccc.ufcg.edu.br)"
-date: "dezembro, 2018"
+date: "janeiro, 2019"
 output: html_document
 ---
 
@@ -10,48 +10,56 @@ require(dplyr)
 ```
 
 # Introdução
-Os resultados analisados neste documento foram obtidos através da execução de múltiplas chamadas de uma mesma função de modo sequencial, isto é, não concorrente. Para tal, utilizamos o script [curl-workload](https://github.com/dfquaresma/pibic-faas/blob/master/analysis/curl-workload.sh) para gerar carga e observar o impacto do coletor de lixo na função [thumbnailator](https://github.com/dfquaresma/pibic-faas/blob/master/functions/thumbnailator/thumbnailator/src/main/java/com/openfaas/function/Handler.java).   
+Os resultados analisados neste documento foram obtidos através da execução de múltiplas chamadas de uma mesma função de modo sequencial, isto é, não concorrente. Para tal, utilizamos o script [curl-workload](https://github.com/dfquaresma/pibic-faas/blob/master/analysis/curl-workload.sh) para gerar carga e observar o impacto do coletor de lixo no [thumbnailator-server](https://github.com/dfquaresma/pibic-faas/tree/master/functions/thumbnailator/thumbnailator-server-maven).   
 
 # Setup
 #### Gerais
-- Execução utilizando ambiente default OpenFaaS.
-- Utilização do of-watchdog (versão que aproveita a runtime).
+- Execução utilizando um [servidor HTTP extraído do OpenFaaS](https://github.com/openfaas/templates/blob/master/template/java8/entrypoint/src/main/java/com/openfaas/entrypoint/App.java).
 
 #### Experimento
-- Execução de 1000 requisições.
+- Execução de 10000 requisições.
 - Execução sequencial das chamadas à função.
 
 #### Função 
-- Linguagem: java8
-- Lógica de negócio: Redimencionamento, rotação, adição de marca d'água e atualização de qualidade de uma imagem.
+- Linguagem: java11
+- Lógica de negócio: Redimencionamento (escala de 1) de uma imagem (131kb), utilizando heap de 512mb.
 - Contabiliza quantas coletas houveram durante a execução da lógica de negócio.
 - Contabiliza a duração das coletas que aconteceram durante a execução da lógica de negócio.
 - Contabiliza o tempo total de execução da lógica de negócio.
 
+#### Observações:
+- Scavenge: coleta na Young Gen.
+- MarkSweep: coleta na Old Gen.
+
 # Resultados
 ### Plot
 ```{r}
-results = read.csv("../curl-workload/thumbnailator-results/131kb-rwm0.csv", header=T, dec=".")
+results = read.csv("./thumbnailator-server-results/h512-s10-i131kb-r10k.csv", header=T, dec=".")
 results = tail(results, -100)
-plot(results$business_time.ms., results$scavenge_count + results$marksweep_count, xlab="tempo de execução (ms)", ylab="numero de coletas", main="Impacto do Coletor (Geral)")
+plot(results$business_time.ms., results$scavenge_time + results$marksweep_time, xlab="tempo de execução (ms)", ylab="numero de coletas", main="Tempo de Execução X Duração das Coletas")
 ```
 
+### Número de coletas
+#### Old Ggeneration.
 ```{r}
-plot(results$business_time.ms., results$scavenge_count, xlab="tempo de execução (ms)", ylab="numero de coletas", main="Impacto do Coletor (Scavenge)")
+sum(results$scavenge_count)
 ```
 
+#### Young Generation.
 ```{r}
-plot(results$business_time.ms., results$marksweep_count, xlab="tempo de execução (ms)", ylab="numero de coletas", main="Impacto do Coletor (Marksweep)")
+sum(results$marksweep_count) 
 ```
 
 ### Correlação Linear
+#### latência X número de coletas
 ```{r}
-cor(results$business_time.ms., results$scavenge_count + results$marksweep_count)
 cor(results$business_time.ms., results$scavenge_count)
-cor(results$business_time.ms., results$marksweep_count)
 ```
 
-Como não houve coleta Marksweep, as análises voltadas para o Marksweep foram comprometidas.
+#### latência X tempo coletando
+```{r}
+cor(results$business_time.ms., results$scavenge_time)
+```
 
 ### Boxplot Geral
 ```{r}
@@ -59,22 +67,6 @@ nocollect <- filter(results, scavenge_count + marksweep_count == 0)
 withcollect <- filter(results, scavenge_count + marksweep_count > 0)
 boxplot(nocollect$business_time.ms., withcollect$business_time.ms., names=c("Não Ocorreu Coleta", "Ocorreu Coleta"), main="Impacto do Coletor (Geral)", outline=FALSE)
 ```
-
-### Boxplot Scavenge
-```{r}
-withScavenge <- filter(results, scavenge_count > 0 & marksweep_count == 0)
-boxplot(nocollect$business_time.ms., withScavenge$business_time.ms., names=c("Não Ocorreu Coleta", "Ocorreu Coleta"), main="Impacto do Coletor (Scavenge)", outline=FALSE)
-```
-
-
-
-### Boxplot Marksweep
-```{r}
-withMarksweep <- filter(results, marksweep_count > 0 & scavenge_count == 0)
-boxplot(nocollect$business_time.ms., withMarksweep$business_time.ms., names=c("Não Ocorreu Coleta", "Ocorreu Coleta"), main="Impacto do Coletor (Marksweep)", outline=FALSE)
-```
-
-Como não houve coleta Marksweep isolada (sem ter ocorrido também coleta Scavenge), as análises voltadas apenas para o Marksweep foram comprometidas.
 
 ### Quantiles
 ```{r}
@@ -93,20 +85,11 @@ qCollect(nocollect)
 qCollect(withcollect)
 ```
 
-#### Comparação Geral
+#### Comparação
 ```{r}
 qCollect(withcollect) / qCollect(nocollect)
 ```
 
-#### Comparação Scavenge
-```{r}
-qCollect(withScavenge) / qCollect(nocollect)
-```
-
-#### Comparação Marksweep
-```{r}
-qCollect(withMarksweep) / qCollect(nocollect)
-```
 
 ### Média, Variância e Desvio Padrão 
 ```{r}
@@ -125,19 +108,7 @@ meanVarSd = function(nocollect, withcollect) {
     withCollect = c(meanWithCollect, varWithCollect, sdWithCollect),
     comparison = c(meanWithCollect / meanNoCollect, varWithCollect / varNoCollect, sdWithCollect / sdNoCollect))
 }
-```
 
-#### Geral
-```{r}
 meanVarSd(nocollect, withcollect)
 ```
 
-#### Scavenge
-```{r}
-meanVarSd(nocollect, withScavenge)
-```
-
-#### Marksweep
-```{r}
-meanVarSd(nocollect, withMarksweep)
-```
