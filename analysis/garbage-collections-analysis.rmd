@@ -2,7 +2,7 @@
 title: "Garbage Collector Impact"
 author: "David Ferreira Quaresma (david.quaresma@ccc.ufcg.edu.br)"
 date: "janeiro, 2019"
-output: html_document
+output: pdf_document
 ---
 
 ```{r setup, include=FALSE}
@@ -13,19 +13,23 @@ require(dplyr)
 Os resultados analisados neste documento foram obtidos através da execução de múltiplas chamadas de uma mesma função de modo sequencial, isto é, não concorrente. Para tal, utilizamos o script [curl-workload](https://github.com/dfquaresma/pibic-faas/blob/master/analysis/curl-workload.sh) para gerar carga e observar o impacto do coletor de lixo no [thumbnailator-server](https://github.com/dfquaresma/pibic-faas/tree/master/functions/thumbnailator/thumbnailator-server-maven).   
 
 # Setup
-#### Gerais
-- Execução utilizando um [servidor HTTP extraído do OpenFaaS](https://github.com/openfaas/templates/blob/master/template/java8/entrypoint/src/main/java/com/openfaas/entrypoint/App.java).
-
-#### Experimento
-- Execução de 10000 requisições.
-- Execução sequencial das chamadas à função.
 
 #### Função 
-- Linguagem: java11
-- Lógica de negócio: Redimencionamento (escala de 1) de uma imagem (131kb), utilizando heap de 512mb.
-- Contabiliza quantas coletas houveram durante a execução da lógica de negócio.
-- Contabiliza a duração das coletas que aconteceram durante a execução da lógica de negócio.
-- Contabiliza o tempo total de execução da lógica de negócio.
+- Ambiente de execução: [servidor HTTP extraído do OpenFaaS](https://github.com/dfquaresma/pibic-faas/blob/master/functions/thumbnailator/thumbnailator-server-maven/src/main/java/com/thumbnailator/server/App.java).
+- Lógica de negócio da função: [Redimencionamento de uma imagem](https://github.com/dfquaresma/pibic-faas/blob/master/functions/thumbnailator/thumbnailator-server-maven/src/main/java/com/thumbnailator/function/Handler.java).
+- Escala de redimencionamento: 0.1.
+- Tamanho da imagem: 131kb.
+
+#### Experimento
+- workload: 10.000 requisições enviadas sequencialmente.
+- jvm: openjdk version "11"
+- gc:  Garbage First Garbage Collector (G1 GC) 
+- heap: 128mb
+
+#### Dados observados 
+- Quantidade de coletas de lixo durante execução da função.
+- Duração das coletas de lixo durante execução da função.
+- Tempo de execução da função.
 
 #### Observações:
 - Scavenge: coleta na Young Gen.
@@ -34,18 +38,17 @@ Os resultados analisados neste documento foram obtidos através da execução de
 # Resultados
 ### Plot
 ```{r}
-results = read.csv("./thumbnailator-server-results/h512-s10-i131kb-r10k.csv", header=T, dec=".")
+results = read.csv("./thumbnailator-server-results/1mb-r0.csv", header=T, dec=".")
 results = tail(results, -100)
 plot(results$business_time.ms., results$scavenge_time + results$marksweep_time, xlab="tempo de execução (ms)", ylab="duração das coletas", main="Tempo de Execução X Duração das Coletas")
 ```
 
 ### Número de coletas
-#### Old Ggeneration.
+#### Young Ggeneration.
 ```{r}
 sum(results$scavenge_count)
 ```
-
-#### Young Generation.
+#### Old Generation.
 ```{r}
 sum(results$marksweep_count) 
 ```
@@ -55,12 +58,10 @@ sum(results$marksweep_count)
 ```{r}
 cor(results$business_time.ms., results$scavenge_count)
 ```
-
 #### latência X tempo coletando
 ```{r}
 cor(results$business_time.ms., results$scavenge_time)
 ```
-
 ### Boxplot Geral
 ```{r}
 nocollect <- filter(results, scavenge_count + marksweep_count == 0)
@@ -74,17 +75,14 @@ qCollect = function(data) {
   quantile(data$business_time.ms., c(.0, .25, .50, .75, .90, .99, .999, .9999))
 }
 ```
-
 #### Não Ocorreu Coleta
 ```{r}
 qCollect(nocollect)
 ```
-
 #### Ocorreu Coleta
 ```{r}
 qCollect(withcollect)
 ```
-
 #### Comparação
 ```{r}
 qCollect(withcollect) / qCollect(nocollect)
