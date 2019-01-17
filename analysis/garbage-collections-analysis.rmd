@@ -2,7 +2,7 @@
 title: "Garbage Collector Impact"
 author: "David Ferreira Quaresma (david.quaresma@ccc.ufcg.edu.br)"
 date: "janeiro, 2019"
-output: pdf_document
+output: html_document
 ---
 
 ```{r setup, include=FALSE}
@@ -21,7 +21,7 @@ Os resultados analisados neste documento foram obtidos através da execução de
 - Tamanho da imagem: 131kb.
 
 #### Experimento
-- workload: 10.000 requisições enviadas sequencialmente.
+- workload: 40.000 requisições enviadas sequencialmente.
 - jvm: openjdk version "11"
 - gc:  Garbage First Garbage Collector (G1 GC) 
 - heap: 128mb
@@ -36,15 +36,13 @@ Os resultados analisados neste documento foram obtidos através da execução de
 - MarkSweep: coleta na Old Gen.
 
 # Resultados
-### Plot
 ```{r}
-results = read.csv("./thumbnailator-server-results/1mb-r0.csv", header=T, dec=".")
+results = read.csv("./thumbnailator-server-results/main_result.csv", header=T, dec=".")
 results = tail(results, -100)
-plot(results$business_time.ms., results$scavenge_time + results$marksweep_time, xlab="tempo de execução (ms)", ylab="duração das coletas", main="Tempo de Execução X Duração das Coletas")
 ```
 
-### Número de coletas
-#### Young Ggeneration.
+## Número de coletas
+#### Young Generation.
 ```{r}
 sum(results$scavenge_count)
 ```
@@ -53,7 +51,12 @@ sum(results$scavenge_count)
 sum(results$marksweep_count) 
 ```
 
-### Correlação Linear
+## Plot
+```{r}
+plot(results$business_time.ms., results$scavenge_time + results$marksweep_time, xlab="tempo de execução (ms)", ylab="duração das coletas", main="Tempo de Execução X Duração das Coletas")
+```
+
+## Correlação Linear
 #### latência X número de coletas
 ```{r}
 cor(results$business_time.ms., results$scavenge_count)
@@ -62,51 +65,103 @@ cor(results$business_time.ms., results$scavenge_count)
 ```{r}
 cor(results$business_time.ms., results$scavenge_time)
 ```
-### Boxplot Geral
+
+## Média, Variância e Desvio Padrão 
 ```{r}
 nocollect <- filter(results, scavenge_count + marksweep_count == 0)
 withcollect <- filter(results, scavenge_count + marksweep_count > 0)
-boxplot(nocollect$business_time.ms., withcollect$business_time.ms., names=c("Não Ocorreu Coleta", "Ocorreu Coleta"), main="Não Ocorreu X Ocorreu", outline=FALSE)
-```
 
-### Quantiles
-```{r}
-qCollect = function(data) {
-  quantile(data$business_time.ms., c(.0, .25, .50, .75, .90, .99, .999, .9999))
-}
-```
-#### Não Ocorreu Coleta
-```{r}
-qCollect(nocollect)
-```
-#### Ocorreu Coleta
-```{r}
-qCollect(withcollect)
-```
-#### Comparação
-```{r}
-qCollect(withcollect) / qCollect(nocollect)
-```
-
-
-### Média, Variância e Desvio Padrão 
-```{r}
 meanVarSd = function(nocollect, withcollect) {
-  meanNoCollect = mean(nocollect$business_time.ms.)
-  varNoCollect = var(nocollect$business_time.ms.)
-  sdNoCollect = sd(nocollect$business_time.ms.)
   
-  meanWithCollect = mean(withcollect$business_time.ms.)
-  varWithCollect = var(withcollect$business_time.ms.)
-  sdWithCollect = sd(withcollect$business_time.ms.)
+  noCollect = c(mean(nocollect$business_time.ms.), 
+                var(nocollect$business_time.ms.), 
+                sd(nocollect$business_time.ms.)) 
+  
+  withCollect = c(mean(withcollect$business_time.ms.), 
+                  var(withcollect$business_time.ms.), 
+                  sd(withcollect$business_time.ms.))
   
   data.frame(
     statistic = c("mean", "var", "sd"), 
-    noCollect = c(meanNoCollect, varNoCollect, sdNoCollect), 
-    withCollect = c(meanWithCollect, varWithCollect, sdWithCollect),
-    comparison = c(meanWithCollect / meanNoCollect, varWithCollect / varNoCollect, sdWithCollect / sdNoCollect))
+    noCollect = noCollect, 
+    withCollect = withCollect,
+    comparison = withCollect / noCollect)
 }
 
 meanVarSd(nocollect, withcollect)
 ```
 
+## Boxplot
+```{r}
+boxplot(nocollect$business_time.ms., withcollect$business_time.ms., names=c("Não Ocorreu Coleta", "Ocorreu Coleta"), main="Não Ocorreu X Ocorreu", outline=FALSE)
+```
+
+## Quantiles
+```{r}
+quantile_wrapped = function(data) {
+  quantile(data$business_time.ms., c(.0, .25, .50, .75, .90, 0.95, .99, .999, .9999, .99999, 1))
+}
+```
+### Tempo coletando
+##### Considerando todas as requisições
+```{r}
+quantile(results$scavenge_time, c(0., 0.25, 0.5, .75, .90, .95, .99, .999, .9999, .99999, 1))
+```
+##### Descartando Requisições Abaixo do p50
+```{r}
+p50 = quantile(results$business_time.ms., 0.50)
+filtered_results = filter(results, business_time.ms. > p50)
+quantile(filtered_results$scavenge_time, c(0., 0.25, 0.5, .75, .90, .95, .99, .999, .9999, .99999, 1))
+```
+
+### Tempo executando 
+##### Não Ocorreu Coleta
+```{r}
+quantile_wrapped(nocollect)
+```
+##### Ocorreu Coleta
+```{r}
+quantile_wrapped(withcollect)
+```
+##### Comparação
+```{r}
+quantile_wrapped(withcollect) / quantile_wrapped(nocollect)
+```
+##### Com e Sem Coleta
+```{r}
+quantile_wrapped(results)
+```
+##### Descartando Requisições Abaixo do p50
+```{r}
+quantile_wrapped(filtered_results)
+```
+
+## Barplot
+```{r}
+interval = function(data, p0, p1, names) {
+  p0 = quantile(data, p0)
+  p1 = quantile(data, p1)
+  p2 = max(filtered_results$business_time.ms.)
+  
+  data[as.numeric(data) <= p0] = p0
+  data[as.numeric(data) > p0 & as.numeric(data) <= p1] = p1
+  data[as.numeric(data) > p1] = p2
+  
+  data[data == p0] = names[1]
+  data[data == p1] = names[2]
+  data[data == p2] = names[3]
+  
+  return(data)
+}
+
+time_collencting = interval(filtered_results$scavenge_time, 0.25
+                            , 0.95, c("0 ms collecting", "1-2 ms collecting", "2-18 ms collecting"))
+
+time_running = interval(filtered_results$business_time.ms., 0.25
+                        , 0.75, c("08-09 ms", "09-13 ms", "13-181 ms"))
+
+counts <- table(time_collencting, time_running)
+barplot(counts, main="",
+  xlab="tempo de execução", col=c("white","gray", "black"),
+  legend = rownames(counts))
+```
