@@ -53,17 +53,17 @@ sum(results$marksweep_count)
 
 ## Plot
 ```{r}
-plot(results$business_time.ms., results$scavenge_time + results$marksweep_time, xlab="tempo de execução (ms)", ylab="duração das coletas", main="Tempo de Execução X Duração das Coletas")
+plot(results$execution_time, results$scavenge_time + results$marksweep_time, xlab="tempo de execução (ms)", ylab="duração das coletas", main="Tempo de Execução X Duração das Coletas")
 ```
 
 ## Correlação Linear
 #### latência X número de coletas
 ```{r}
-cor(results$business_time.ms., results$scavenge_count)
+cor(results$execution_time, results$scavenge_count)
 ```
 #### latência X tempo coletando
 ```{r}
-cor(results$business_time.ms., results$scavenge_time)
+cor(results$execution_time, results$scavenge_time)
 ```
 
 ## Média, Variância e Desvio Padrão 
@@ -73,13 +73,13 @@ withcollect <- filter(results, scavenge_count + marksweep_count > 0)
 
 meanVarSd = function(nocollect, withcollect) {
   
-  noCollect = c(mean(nocollect$business_time.ms.), 
-                var(nocollect$business_time.ms.), 
-                sd(nocollect$business_time.ms.)) 
+  noCollect = c(mean(nocollect$execution_time),
+                var(nocollect$execution_time),
+                sd(nocollect$execution_time))
   
-  withCollect = c(mean(withcollect$business_time.ms.), 
-                  var(withcollect$business_time.ms.), 
-                  sd(withcollect$business_time.ms.))
+  withCollect = c(mean(withcollect$execution_time),
+                  var(withcollect$execution_time),
+                  sd(withcollect$execution_time))
   
   data.frame(
     statistic = c("mean", "var", "sd"), 
@@ -93,25 +93,14 @@ meanVarSd(nocollect, withcollect)
 
 ## Boxplot
 ```{r}
-boxplot(nocollect$business_time.ms., withcollect$business_time.ms., names=c("Não Ocorreu Coleta", "Ocorreu Coleta"), main="Não Ocorreu X Ocorreu", outline=FALSE)
+boxplot(nocollect$execution_time, withcollect$execution_time, names=c("Não Ocorreu Coleta", "Ocorreu Coleta"), main="Não Ocorreu X Ocorreu", outline=FALSE)
 ```
 
 ## Quantiles
 ```{r}
 quantile_wrapped = function(data) {
-  quantile(data$business_time.ms., c(.0, .25, .50, .75, .90, 0.95, .99, .999, .9999, .99999, 1))
+  quantile(data$execution_time, c(.0, .25, .50, .75, .90, .95, .99, .999, .9999, .99999, 1))
 }
-```
-### Tempo coletando
-##### Considerando todas as requisições
-```{r}
-quantile(results$scavenge_time, c(0., 0.25, 0.5, .75, .90, .95, .99, .999, .9999, .99999, 1))
-```
-##### Descartando Requisições Abaixo do p50
-```{r}
-p50 = quantile(results$business_time.ms., 0.50)
-filtered_results = filter(results, business_time.ms. > p50)
-quantile(filtered_results$scavenge_time, c(0., 0.25, 0.5, .75, .90, .95, .99, .999, .9999, .99999, 1))
 ```
 
 ### Tempo executando 
@@ -131,37 +120,40 @@ quantile_wrapped(withcollect) / quantile_wrapped(nocollect)
 ```{r}
 quantile_wrapped(results)
 ```
-##### Descartando Requisições Abaixo do p50
+### Tempo coletando
 ```{r}
-quantile_wrapped(filtered_results)
+quantile(results$scavenge_time, c(.0, .25, .5, .75, .90, .95, .99, .999, .9999, .99999, 1))
 ```
 
 ## Barplot
 ```{r}
-interval = function(data, p0, p1, names) {
+interval = function(data, p0, p1, p2, names) {
   p0 = quantile(data, p0)
   p1 = quantile(data, p1)
-  p2 = max(filtered_results$business_time.ms.)
+  p2 = quantile(data, p2)
+  p3 = max(results$execution_time)
   
   data[as.numeric(data) <= p0] = p0
   data[as.numeric(data) > p0 & as.numeric(data) <= p1] = p1
-  data[as.numeric(data) > p1] = p2
-  
+  data[as.numeric(data) > p1 & as.numeric(data) <= p2] = p2
+  data[as.numeric(data) > p2] = p3
+ 
   data[data == p0] = names[1]
   data[data == p1] = names[2]
   data[data == p2] = names[3]
+  data[data == p3] = names[4]
   
   return(data)
 }
+time_running = interval(results$execution_time, .25, .75, .95
+                        , c("06 ms", "06-07 ms", "07-14 ms", "14-181 ms"))
 
-time_collencting = interval(filtered_results$scavenge_time, 0.25
-                            , 0.95, c("0 ms collecting", "1-2 ms collecting", "2-18 ms collecting"))
-
-time_running = interval(filtered_results$business_time.ms., 0.25
-                        , 0.75, c("08-09 ms", "09-13 ms", "13-181 ms"))
+time_collencting = interval(results$scavenge_time, .25, .99, .99
+                            , c("0 ms collecting", "1-2 ms collecting"
+                                , "2-18 ms collecting", "2-18 ms collecting"))
 
 counts <- table(time_collencting, time_running)
 barplot(counts, main="",
   xlab="tempo de execução", col=c("white","gray", "black"),
-  legend = rownames(counts))
+  names = c("6 ms", "6-7 ms", "7-14 ms", "14-181 ms"), legend = rownames(counts))
 ```
