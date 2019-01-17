@@ -7,6 +7,7 @@ output: html_document
 
 ```{r setup, include=FALSE}
 require(dplyr)
+source("functions.R")
 ```
 
 # Introdução
@@ -39,6 +40,8 @@ Os resultados analisados neste documento foram obtidos através da execução de
 ```{r}
 results = read.csv("./thumbnailator-server-results/main_result.csv", header=T, dec=".")
 results = tail(results, -100)
+nocollect <- filter(results, scavenge_count + marksweep_count == 0)
+withcollect <- filter(results, scavenge_count + marksweep_count > 0)
 ```
 
 ## Número de coletas
@@ -51,9 +54,33 @@ sum(results$scavenge_count)
 sum(results$marksweep_count) 
 ```
 
-## Plot
+## Boxplot
+```{r}
+boxplot(nocollect$execution_time, withcollect$execution_time, names=c("Não Ocorreu Coleta", "Ocorreu Coleta"), main="", outline=FALSE)
+```
+
+## Barplot
+```{r}
+time_running = interval(results$execution_time, .25, .75, .95
+                        , c("06 ms", "06-07 ms", "07-14 ms", "14-181 ms"))
+time_collencting = interval(results$scavenge_time, .25, .99, .99
+                            , c("0 ms collecting", "1-2 ms collecting"
+                                , "2-18 ms collecting", "2-18 ms collecting"))
+
+counts <- table(time_collencting, time_running)
+barplot(counts, main="",
+  xlab="tempo de execução", col=c("white","gray", "black"),
+  names = c("6 ms", "6-7 ms", "7-14 ms", "14-181 ms"), legend = rownames(counts))
+```
+
+## Scatterplot
 ```{r}
 plot(results$execution_time, results$scavenge_time + results$marksweep_time, xlab="tempo de execução (ms)", ylab="duração das coletas", main="Tempo de Execução X Duração das Coletas")
+```
+
+## Média, Variância e Desvio Padrão 
+```{r}
+meanVarSd(nocollect, withcollect)
 ```
 
 ## Correlação Linear
@@ -66,94 +93,25 @@ cor(results$execution_time, results$scavenge_count)
 cor(results$execution_time, results$scavenge_time)
 ```
 
-## Média, Variância e Desvio Padrão 
-```{r}
-nocollect <- filter(results, scavenge_count + marksweep_count == 0)
-withcollect <- filter(results, scavenge_count + marksweep_count > 0)
-
-meanVarSd = function(nocollect, withcollect) {
-  
-  noCollect = c(mean(nocollect$execution_time),
-                var(nocollect$execution_time),
-                sd(nocollect$execution_time))
-  
-  withCollect = c(mean(withcollect$execution_time),
-                  var(withcollect$execution_time),
-                  sd(withcollect$execution_time))
-  
-  data.frame(
-    statistic = c("mean", "var", "sd"), 
-    noCollect = noCollect, 
-    withCollect = withCollect,
-    comparison = withCollect / noCollect)
-}
-
-meanVarSd(nocollect, withcollect)
-```
-
-## Boxplot
-```{r}
-boxplot(nocollect$execution_time, withcollect$execution_time, names=c("Não Ocorreu Coleta", "Ocorreu Coleta"), main="Não Ocorreu X Ocorreu", outline=FALSE)
-```
-
 ## Quantiles
+### Tempo coletando
 ```{r}
-quantile_wrapped = function(data) {
-  quantile(data$execution_time, c(.0, .25, .50, .75, .90, .95, .99, .999, .9999, .99999, 1))
-}
+quantile_wrapped(results$scavenge_time)
 ```
-
 ### Tempo executando 
+##### Com e Sem Coleta
+```{r}
+quantile_wrapped_for_execution_time(results)
+```
 ##### Não Ocorreu Coleta
 ```{r}
-quantile_wrapped(nocollect)
+quantile_wrapped_for_execution_time(nocollect)
 ```
 ##### Ocorreu Coleta
 ```{r}
-quantile_wrapped(withcollect)
+quantile_wrapped_for_execution_time(withcollect)
 ```
 ##### Comparação
 ```{r}
-quantile_wrapped(withcollect) / quantile_wrapped(nocollect)
-```
-##### Com e Sem Coleta
-```{r}
-quantile_wrapped(results)
-```
-### Tempo coletando
-```{r}
-quantile(results$scavenge_time, c(.0, .25, .5, .75, .90, .95, .99, .999, .9999, .99999, 1))
-```
-
-## Barplot
-```{r}
-interval = function(data, p0, p1, p2, names) {
-  p0 = quantile(data, p0)
-  p1 = quantile(data, p1)
-  p2 = quantile(data, p2)
-  p3 = max(results$execution_time)
-  
-  data[as.numeric(data) <= p0] = p0
-  data[as.numeric(data) > p0 & as.numeric(data) <= p1] = p1
-  data[as.numeric(data) > p1 & as.numeric(data) <= p2] = p2
-  data[as.numeric(data) > p2] = p3
- 
-  data[data == p0] = names[1]
-  data[data == p1] = names[2]
-  data[data == p2] = names[3]
-  data[data == p3] = names[4]
-  
-  return(data)
-}
-time_running = interval(results$execution_time, .25, .75, .95
-                        , c("06 ms", "06-07 ms", "07-14 ms", "14-181 ms"))
-
-time_collencting = interval(results$scavenge_time, .25, .99, .99
-                            , c("0 ms collecting", "1-2 ms collecting"
-                                , "2-18 ms collecting", "2-18 ms collecting"))
-
-counts <- table(time_collencting, time_running)
-barplot(counts, main="",
-  xlab="tempo de execução", col=c("white","gray", "black"),
-  names = c("6 ms", "6-7 ms", "7-14 ms", "14-181 ms"), legend = rownames(counts))
+quantile_wrapped_for_execution_time(withcollect) / quantile_wrapped_for_execution_time(nocollect)
 ```
