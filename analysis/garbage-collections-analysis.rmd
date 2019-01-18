@@ -45,13 +45,8 @@ withcollect <- filter(results, scavenge_count + marksweep_count > 0)
 ```
 
 ## Número de coletas
-#### Young Generation.
 ```{r}
-sum(results$scavenge_count)
-```
-#### Old Generation.
-```{r}
-sum(results$marksweep_count) 
+coletas_dataframe(results)
 ```
 
 ## Scatterplot
@@ -63,13 +58,8 @@ plot(results$execution_time, time_collecting,
 ```
 
 ## Correlação Linear
-#### latência X número de coletas
 ```{r}
-cor(results$execution_time, results$scavenge_count + results$marksweep_count)
-```
-#### latência X tempo coletando
-```{r}
-cor(results$execution_time, time_collecting)
+cor_dataframe(results)
 ```
 
 ## Boxplot
@@ -104,17 +94,7 @@ quantile_wrapped(time_collecting)
 ```{r}
 quantile_wrapped_for_execution_time(results)
 ```
-##### Não Ocorreu Coleta
+##### Comparação: Sem coleta X Com coleta
 ```{r}
-quantile_wrapped_for_execution_time(nocollect)
+quantiles_dataframe_comparison(nocollect, withcollect)
 ```
-##### Ocorreu Coleta
-```{r}
-quantile_wrapped_for_execution_time(withcollect)
-```
-##### Comparação
-```{r}
-(quantile_wrapped_for_execution_time(withcollect) 
- / quantile_wrapped_for_execution_time(nocollect))
-```
-
