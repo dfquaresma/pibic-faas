@@ -11,13 +11,13 @@ source("functions.R")
 ```
 
 # Introdução
-Os resultados analisados neste documento foram obtidos através da execução de múltiplas chamadas de uma mesma função de modo sequencial, isto é, não concorrente. Para tal, utilizamos o script [curl-workload](https://github.com/dfquaresma/pibic-faas/blob/master/analysis/curl-workload.sh) para gerar carga e observar o impacto do coletor de lixo no [thumbnailator-server](https://github.com/dfquaresma/pibic-faas/tree/master/functions/thumbnailator/thumbnailator-server-maven).   
+Os resultados analisados neste documento foram obtidos através da execução de múltiplas chamadas de uma mesma função de modo sequencial, isto é, não concorrente. Para tal, utilizamos o script [**curl-workload**](https://github.com/dfquaresma/pibic-faas/blob/master/analysis/curl-workload.sh) para gerar carga e observar o impacto do coletor de lixo no [**thumbnailator-server**](https://github.com/dfquaresma/pibic-faas/tree/master/functions/thumbnailator/thumbnailator-server-maven).
 
 # Setup
 
 #### Função 
-- Ambiente de execução: [servidor HTTP extraído do OpenFaaS](https://github.com/dfquaresma/pibic-faas/blob/master/functions/thumbnailator/thumbnailator-server-maven/src/main/java/com/thumbnailator/server/App.java).
-- Lógica de negócio da função: [Redimencionamento de uma imagem](https://github.com/dfquaresma/pibic-faas/blob/master/functions/thumbnailator/thumbnailator-server-maven/src/main/java/com/thumbnailator/function/Handler.java).
+- Ambiente de execução: [**servidor HTTP extraído do OpenFaaS**](https://github.com/dfquaresma/pibic-faas/blob/master/functions/thumbnailator/thumbnailator-server-maven/src/main/java/com/thumbnailator/server/App.java).
+- Lógica de negócio da função: [**Redimencionamento de uma imagem**](https://github.com/dfquaresma/pibic-faas/blob/master/functions/thumbnailator/thumbnailator-server-maven/src/main/java/com/thumbnailator/function/Handler.java).
 - Escala de redimencionamento: 0.1.
 - Tamanho da imagem: 131kb.
 
@@ -54,49 +54,50 @@ sum(results$scavenge_count)
 sum(results$marksweep_count) 
 ```
 
-## Boxplot
-```{r}
-boxplot(nocollect$execution_time, withcollect$execution_time, names=c("Não Ocorreu Coleta", "Ocorreu Coleta"), main="", outline=FALSE)
-```
-
-## Barplot
-```{r}
-time_running = interval(results$execution_time, .25, .75, .95
-                        , c("06 ms", "06-07 ms", "07-14 ms", "14-181 ms"))
-time_collencting = interval(results$scavenge_time, .25, .99, .99
-                            , c("0 ms collecting", "1-2 ms collecting"
-                                , "2-18 ms collecting", "2-18 ms collecting"))
-
-counts <- table(time_collencting, time_running)
-barplot(counts, main="",
-  xlab="tempo de execução", col=c("white","gray", "black"),
-  names = c("6 ms", "6-7 ms", "7-14 ms", "14-181 ms"), legend = rownames(counts))
-```
-
 ## Scatterplot
 ```{r}
-plot(results$execution_time, results$scavenge_time + results$marksweep_time, xlab="tempo de execução (ms)", ylab="duração das coletas", main="Tempo de Execução X Duração das Coletas")
-```
-
-## Média, Variância e Desvio Padrão 
-```{r}
-meanVarSd(nocollect, withcollect)
+time_collecting = results$scavenge_time + results$marksweep_time
+plot(results$execution_time, time_collecting,
+     xlab="tempo de execução (ms)", ylab="duração das coletas",
+     main="Tempo de Execução X Duração das Coletas")
 ```
 
 ## Correlação Linear
 #### latência X número de coletas
 ```{r}
-cor(results$execution_time, results$scavenge_count)
+cor(results$execution_time, results$scavenge_count + results$marksweep_count)
 ```
 #### latência X tempo coletando
 ```{r}
-cor(results$execution_time, results$scavenge_time)
+cor(results$execution_time, time_collecting)
+```
+
+## Boxplot
+```{r}
+boxplot(nocollect$execution_time, withcollect$execution_time,
+        names=c("Não Ocorreu Coleta", "Ocorreu Coleta"),
+        main="Tempo de execução", outline=FALSE)
+```
+
+## Média, Variância e Desvio Padrão
+```{r}
+meanVarSd(nocollect, withcollect)
+```
+
+## Barplot
+```{r}
+build_barplot(results)
+```
+
+## ECDF
+```{r}
+plot_ecdf(nocollect, withcollect)
 ```
 
 ## Quantiles
 ### Tempo coletando
 ```{r}
-quantile_wrapped(results$scavenge_time)
+quantile_wrapped(time_collecting)
 ```
 ### Tempo executando 
 ##### Com e Sem Coleta
@@ -116,3 +117,4 @@ quantile_wrapped_for_execution_time(withcollect)
 (quantile_wrapped_for_execution_time(withcollect) 
  / quantile_wrapped_for_execution_time(nocollect))
 ```
+

@@ -41,3 +41,35 @@ quantile_wrapped = function(data) {
 quantile_wrapped_for_execution_time = function(data) {
   quantile_wrapped(data$execution_time)
 }
+
+plot_ecdf = function(nocollect, withcollect) {
+  ecdf_nocollect = ecdf(nocollect$execution_time)
+  ecdf_withcollect = ecdf(withcollect$execution_time)
+  
+  plot(ecdf_nocollect, verticals=TRUE, do.points=FALSE
+       , main="ECDF", xlab="tempo de execução (ms)"
+       , ylab="frequencia", col='blue',
+       xlim=c(0, 100)) 
+  plot(ecdf_withcollect, verticals=TRUE
+       , do.points=FALSE, add=TRUE, col='red',
+       xlim=c(0, 100))
+  
+  legend("bottomright", 
+         legend=c("Não ocorreu coleta", "Ocorreu coleta"),
+         col=c("blue", "red"), pch = c(16,16), bty = "n", 
+         pt.cex = 1, cex = 1.2, text.col = "black", 
+         horiz = F , inset = c(0.1, 0.1))
+}
+
+build_barplot = function(results) {
+  time_running = interval(results$execution_time, .25, .75, .95
+                          , c("06 ms", "06-07 ms", "07-14 ms", "14-181 ms"))
+  time_collencting = interval(results$scavenge_time, .25, .99, .99
+                              , c("0 ms collecting", "1-2 ms collecting"
+                                  , "2-18 ms collecting", "2-18 ms collecting"))
+  
+  counts <- table(time_collencting, time_running)
+  barplot(counts, main="",
+          xlab="tempo de execução", col=c("white","gray", "black"),
+          names = c("6 ms", "6-7 ms", "7-14 ms", "14-181 ms"), legend = rownames(counts))
+}
