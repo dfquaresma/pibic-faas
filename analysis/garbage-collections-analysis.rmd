@@ -113,6 +113,6 @@ quantile_wrapped_for_execution_time(withcollect)
 ```
 ##### Comparação
 ```{r}
-quantile_wrapped_for_execution_time(withcollect) 
-/ quantile_wrapped_for_execution_time(nocollect)
+(quantile_wrapped_for_execution_time(withcollect) 
+ / quantile_wrapped_for_execution_time(nocollect))
 ```
