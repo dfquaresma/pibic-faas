@@ -2,7 +2,7 @@
 title: "Garbage Collector Impact"
 author: "David Ferreira Quaresma (david.quaresma@ccc.ufcg.edu.br)"
 date: "janeiro, 2019"
-output: html_document
+output: pdf_document
 ---
 
 ```{r setup, include=FALSE}
@@ -113,5 +113,6 @@ quantile_wrapped_for_execution_time(withcollect)
 ```
 ##### Comparação
 ```{r}
-quantile_wrapped_for_execution_time(withcollect) / quantile_wrapped_for_execution_time(nocollect)
+quantile_wrapped_for_execution_time(withcollect) 
+/ quantile_wrapped_for_execution_time(nocollect)
 ```
