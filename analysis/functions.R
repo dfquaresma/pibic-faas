@@ -45,7 +45,7 @@ build_barplot = function(results) {
   
   counts <- table(time_collencting, time_running)
   barplot(counts, main="",
-          xlab="tempo de execução", col=c("white","gray", "black"),
+          xlab="tempo de execução", ylab="Frequência", col=c("white","gray", "black"),
           names = c("6 ms", "6-7 ms", "7-14 ms", "14-181 ms"), legend = rownames(counts))
 }
 

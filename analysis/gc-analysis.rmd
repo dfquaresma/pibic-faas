@@ -10,18 +10,17 @@ require(dplyr)
 source("functions.R")
 ```
 
-# Introdução
+# Descrição
 Os resultados analisados neste documento foram obtidos através da execução de múltiplas chamadas de uma mesma função de modo sequencial, isto é, não concorrente. Para tal, utilizamos o script [**curl-workload**](https://github.com/dfquaresma/pibic-faas/blob/master/analysis/curl-workload.sh) para gerar carga e observar o impacto do coletor de lixo no [**thumbnailator-server**](https://github.com/dfquaresma/pibic-faas/tree/master/functions/thumbnailator/thumbnailator-server-maven).
 
-# Setup
-
-#### Função 
+# Experimento
+#### Função e Ambiente
 - Ambiente de execução: [**servidor HTTP extraído do OpenFaaS**](https://github.com/dfquaresma/pibic-faas/blob/master/functions/thumbnailator/thumbnailator-server-maven/src/main/java/com/thumbnailator/server/App.java).
 - Lógica de negócio da função: [**Redimencionamento de uma imagem**](https://github.com/dfquaresma/pibic-faas/blob/master/functions/thumbnailator/thumbnailator-server-maven/src/main/java/com/thumbnailator/function/Handler.java).
 - Escala de redimencionamento: 0.1.
 - Tamanho da imagem: 131kb.
 
-#### Experimento
+#### Setup
 - workload: 40.000 requisições enviadas sequencialmente.
 - jvm: openjdk version "11"
 - gc:  Garbage First Garbage Collector (G1 GC) 
@@ -35,6 +34,7 @@ Os resultados analisados neste documento foram obtidos através da execução de
 #### Observações:
 - Scavenge: coleta na Young Gen.
 - MarkSweep: coleta na Old Gen.
+- Warmup: removemos as 100 primeiras requisições
 
 # Resultados
 ```{r}
@@ -89,11 +89,13 @@ plot_ecdf(nocollect, withcollect)
 ```{r}
 quantile_wrapped(time_collecting)
 ```
+
 ### Tempo executando 
 ##### Com e Sem Coleta
 ```{r}
 quantile_wrapped_for_execution_time(results)
 ```
+
 ##### Comparação: Sem coleta X Com coleta
 ```{r}
 quantiles_dataframe_comparison(nocollect, withcollect)
