@@ -1,4 +1,4 @@
-pid,business_time(ms),scavenge_count,scavenge_time,marksweep_count,marksweep_time
+pid,execution_time,scavenge_count,scavenge_time,marksweep_count,marksweep_time
 19228,0,0,0,0,0
 19228,0,0,0,0,0
 19228,1,0,0,0,0
