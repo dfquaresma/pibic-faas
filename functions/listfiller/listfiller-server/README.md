@@ -11,5 +11,5 @@ mvn clean install
 After running maven and build the project you can run the server running the jar file. Some environment variables definition are required.  See an example as follow.
 
 ```bash
-to_power_of=21 java -jar target/business-server-0.0.1-SNAPSHOT.jar
+to_power_of=21 java -jar target/listfiller-server-0.0.1-SNAPSHOT.jar
 ```
