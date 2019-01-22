@@ -29,7 +29,7 @@ public class App {
         server.createContext("/", invokeHandler);
         server.setExecutor(null); // creates a default executor
         server.start();
-    	
+
         System.out.println("SERVER STARTED!");
         System.out.println("LISTENING TO:" + server.getAddress());
     }
@@ -57,7 +57,7 @@ public class App {
                 // StandardCharsets.UTF_8.name() > JDK 7
                 requestBody = result.toString("UTF-8");
 	        }
-            
+
             // System.out.println(requestBody);
             Headers reqHeaders = t.getRequestHeaders();
             Map<String, String> reqHeadersMap = new HashMap<String, String>();
@@ -74,7 +74,7 @@ public class App {
             // }
 
             IRequest req = new Request(requestBody, reqHeadersMap,t.getRequestURI().getRawQuery(), t.getRequestURI().getPath());
-            
+
             IResponse res = this.handler.Handle(req);
 
             String response = res.getBody();
@@ -97,6 +97,8 @@ public class App {
             os.close();
 
             //System.out.println("Request / " + Integer.toString(bytesOut.length) +" bytes written.");
+
+            t.close();
         }
     }
 
