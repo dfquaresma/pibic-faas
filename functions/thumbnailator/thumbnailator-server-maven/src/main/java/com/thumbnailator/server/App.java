@@ -11,9 +11,10 @@ import java.net.InetSocketAddress;
 
 import java.util.HashMap;
 import java.util.Map;
-import com.sun.net.httpserver.Headers;
+import java.util.concurrent.Executors;
 
 import com.thumbnailator.model.*;
+import com.sun.net.httpserver.Headers;
 
 public class App {
 
@@ -27,7 +28,7 @@ public class App {
         InvokeHandler invokeHandler = new InvokeHandler(handler);
 
         server.createContext("/", invokeHandler);
-        server.setExecutor(null); // creates a default executor
+        server.setExecutor(Executors.newSingleThreadExecutor()); // creates a default executor
         server.start();
 
         System.out.println("SERVER STARTED!");
