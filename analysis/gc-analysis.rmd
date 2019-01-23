@@ -84,7 +84,7 @@ build_barplot(results, running_names = c("08-10 ms", "11-11 ms", "12-16 ms", "17
 ## ECDF
 ```{r}
 graph_tail(nocollect$execution_time, withcollect$execution_time,
-           title="ECDF", x_limit=200, annotate_y=0.90)
+           title="ECDF", x_limit_inf=0, x_limit_sup=200, annotate_y=0.90)
 ```
 
 ## Quantiles
