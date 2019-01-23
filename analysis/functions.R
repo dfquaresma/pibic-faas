@@ -49,7 +49,7 @@ plot_ecdf = function(nocollect, withcollect, limit) {
          horiz = F , inset = c(0.1, 0.1))
 }
 
-graph_tail <- function(no_collect, with_collect, title, x_limit, annotate_y) {
+graph_tail <- function(no_collect, with_collect, title, x_limit_inf, x_limit_sup, annotate_y) {
   cmp <- rbind(
     data.frame("execution_time"=no_collect, Type="Não ocorreu coleta"),
     data.frame("execution_time"=with_collect, Type="Ocorreu coleta")
@@ -81,7 +81,7 @@ graph_tail <- function(no_collect, with_collect, title, x_limit, annotate_y) {
     
     #scale_x_continuous(breaks=seq(0, max(cmp$latency), 10)) +
     #coord_cartesian(ylim = c(0.99, 1)) +
-    xlim(0, x_limit) +
+    xlim(x_limit_inf, x_limit_sup) +
     theme(legend.position="top") +
     scale_color_manual(breaks = c("Não ocorreu coleta", "Ocorreu coleta"), values=c("blue", "red")) +
     theme_bw() +
