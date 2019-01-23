@@ -7,6 +7,7 @@ output: pdf_document
 
 ```{r setup, include=FALSE}
 require(dplyr)
+require(ggplot2)
 source("functions.R")
 ```
 
@@ -21,10 +22,11 @@ Os resultados analisados neste documento foram obtidos através da execução de
 - Tamanho da imagem: 131kb.
 
 #### Setup
-- workload: 40.000 requisições enviadas sequencialmente.
+- workload: 10.000 requisições enviadas sequencialmente.
 - jvm: openjdk version "11"
 - gc:  Garbage First Garbage Collector (G1 GC) 
 - heap: 128mb
+- taskset: 2 CPUs
 
 #### Dados observados 
 - Quantidade de coletas de lixo durante execução da função.
@@ -38,7 +40,7 @@ Os resultados analisados neste documento foram obtidos através da execução de
 
 # Resultados
 ```{r}
-results = read.csv("./thumbnailator-server-results/main_result.csv", header=T, dec=".")
+results = read.csv("./results/thumbnailator-01s-131kb-128h-j11.csv", header=T, dec=".")
 results = tail(results, -100)
 nocollect <- filter(results, scavenge_count + marksweep_count == 0)
 withcollect <- filter(results, scavenge_count + marksweep_count > 0)
@@ -52,9 +54,8 @@ coletas_dataframe(results)
 ## Scatterplot
 ```{r}
 time_collecting = results$scavenge_time + results$marksweep_time
-plot(results$execution_time, time_collecting,
-     xlab="tempo de execução (ms)", ylab="duração das coletas",
-     main="Tempo de Execução X Duração das Coletas")
+plot(results$execution_time, time_collecting, xlab="tempo de execução (ms)",
+     ylab="duração das coletas", main="Tempo de Execução X Duração das Coletas")
 ```
 
 ## Correlação Linear
@@ -64,9 +65,8 @@ cor_dataframe(results)
 
 ## Boxplot
 ```{r}
-boxplot(nocollect$execution_time, withcollect$execution_time,
-        names=c("Não Ocorreu Coleta", "Ocorreu Coleta"),
-        main="Tempo de execução", outline=FALSE)
+boxplot(nocollect$execution_time, withcollect$execution_time, outline=FALSE,
+        names=c("Não Ocorreu Coleta", "Ocorreu Coleta"), main="Tempo de execução")
 ```
 
 ## Média, Variância e Desvio Padrão
@@ -76,12 +76,15 @@ meanVarSd(nocollect, withcollect)
 
 ## Barplot
 ```{r}
-build_barplot(results)
+build_barplot(results, running_names = c("08-10 ms", "11-11 ms", "12-16 ms", "17-197 ms"),
+              collecting_names = c("00-00 ms collecting", "01-01 ms collecting",
+                "02-08 ms collecting", "09-28 ms collecting"))
 ```
 
 ## ECDF
 ```{r}
-plot_ecdf(nocollect, withcollect)
+graph_tail(nocollect$execution_time, withcollect$execution_time,
+           title="ECDF", x_limit=200, annotate_y=0.90)
 ```
 
 ## Quantiles
