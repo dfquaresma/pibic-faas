@@ -55,7 +55,7 @@ public class Handler implements com.listfiller.model.IHandler {
     public String callFunction() {
         String err = "";
         try {
-        	int size = (int) Math.pow(2, Integer.parseInt(System.getenv("to_power_of")));
+            int size = (int) Math.pow(2, Integer.parseInt(System.getenv("to_power_of")));
             List<Integer> list  = new ArrayList();
             for (int i = 0; i < size; i++) {
                     list.add(i);

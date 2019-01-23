@@ -17,17 +17,30 @@ interval = function(data, p0, p1, p2, names) {
   return(data)
 }
 
-plot_ecdf = function(nocollect, withcollect) {
+build_barplot = function(results, running_names, collecting_names) {
+  time_running = interval(results$execution_time, .25, .75, .95
+                          , c("0-25", "25-75", "75-95", "95-100"))
+  time_collencting = interval(results$scavenge_time, .25, .95, .99, collecting_names)
+  
+  counts <- table(time_collencting, time_running)
+  barplot(counts, main="",
+          xlab="tempo de execução", ylab="Frequência", col=c("white","gray", "black", "red"),
+          names = running_names, legend = rownames(counts))
+}
+
+plot_ecdf = function(nocollect, withcollect, limit) {
   ecdf_nocollect = ecdf(nocollect$execution_time)
   ecdf_withcollect = ecdf(withcollect$execution_time)
+  
+  x_limit = c(0, limit)
   
   plot(ecdf_nocollect, verticals=TRUE, do.points=FALSE
        , main="ECDF", xlab="tempo de execução (ms)"
        , ylab="frequencia", col='blue',
-       xlim=c(0, 100)) 
+       xlim=x_limit) 
   plot(ecdf_withcollect, verticals=TRUE
        , do.points=FALSE, add=TRUE, col='red',
-       xlim=c(0, 100))
+       xlim=x_limit)
   
   legend("bottomright", 
          legend=c("Não ocorreu coleta", "Ocorreu coleta"),
@@ -36,17 +49,47 @@ plot_ecdf = function(nocollect, withcollect) {
          horiz = F , inset = c(0.1, 0.1))
 }
 
-build_barplot = function(results) {
-  time_running = interval(results$execution_time, .25, .75, .95
-                          , c("06 ms", "06-07 ms", "07-14 ms", "14-181 ms"))
-  time_collencting = interval(results$scavenge_time, .25, .99, .99
-                              , c("0 ms collecting", "1-2 ms collecting"
-                                  , "2-18 ms collecting", "2-18 ms collecting"))
+graph_tail <- function(no_collect, with_collect, title, x_limit, annotate_y) {
+  cmp <- rbind(
+    data.frame("execution_time"=no_collect, Type="Não ocorreu coleta"),
+    data.frame("execution_time"=with_collect, Type="Ocorreu coleta")
+  )
+  no_collect.color <- "blue"
+  no_collect.p999 <- quantile(no_collect, 0.9999)
+  no_collect.p50 <- quantile(no_collect, 0.5)
   
-  counts <- table(time_collencting, time_running)
-  barplot(counts, main="",
-          xlab="tempo de execução", ylab="Frequência", col=c("white","gray", "black"),
-          names = c("6 ms", "6-7 ms", "7-14 ms", "14-181 ms"), legend = rownames(counts))
+  with_collect.color <- "red"
+  with_collect.p999 <- quantile(with_collect, 0.9999)
+  with_collect.p50 <- quantile(with_collect, 0.5)
+  
+  size = 0.5
+  alpha = 0.5
+  angle = 90
+  p <- ggplot(cmp, aes(execution_time, color=Type)) +
+    stat_ecdf(size=size) +
+    # P50
+    annotate(geom="text", x=no_collect.p50, y=annotate_y, label="Median", angle=angle, color=no_collect.color) +
+    geom_vline(xintercept=no_collect.p50, linetype="dotted", size=size, alpha=alpha, color=no_collect.color) +
+    annotate(geom="text", x=with_collect.p50, y=annotate_y, label="Median", angle=angle, color=with_collect.color) + 
+    geom_vline(xintercept=with_collect.p50, linetype="dotted", size=size, alpha=alpha, color=with_collect.color) +
+    
+    # P999
+    annotate(geom="text", x=no_collect.p999, y=annotate_y, label="99.99th", angle=angle, color=no_collect.color) +
+    geom_vline(xintercept=no_collect.p999, linetype="dotted", size=size, alpha=alpha, color=no_collect.color) +
+    annotate(geom="text", x=with_collect.p999, y=annotate_y, label="99.99th", angle=angle, color=with_collect.color) + 
+    geom_vline(xintercept=with_collect.p999, linetype="dotted", size=size, alpha=alpha, color=with_collect.color) +
+    
+    #scale_x_continuous(breaks=seq(0, max(cmp$latency), 10)) +
+    #coord_cartesian(ylim = c(0.99, 1)) +
+    xlim(0, x_limit) +
+    theme(legend.position="top") +
+    scale_color_manual(breaks = c("Não ocorreu coleta", "Ocorreu coleta"), values=c("blue", "red")) +
+    theme_bw() +
+    ggtitle(title) +
+    xlab("tempo de execução (ms)") +
+    ylab("frequência") 
+  
+  print(p)
 }
 
 meanVarSd = function(nocollect, withcollect) {
@@ -101,4 +144,3 @@ quantiles_dataframe_comparison = function(nocollect, withcollect) {
     comparison = comparison
   )
 }
-
