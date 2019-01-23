@@ -28,7 +28,7 @@ public class App {
         InvokeHandler invokeHandler = new InvokeHandler(handler);
 
         server.createContext("/", invokeHandler);
-        server.setExecutor(Executors.newSingleThreadExecutor()); // creates a default executor
+        server.setExecutor(Executors.newSingleThreadExecutor()); 
         server.start();
     	
         System.out.println("SERVER STARTED!");
