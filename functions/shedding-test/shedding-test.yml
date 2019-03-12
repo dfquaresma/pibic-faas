@@ -1,0 +1,8 @@
+provider:
+  name: openfaas
+  gateway: http://127.0.0.1:8080
+functions:
+  shedding-test:
+    lang: java8
+    handler: ./shedding-test
+    image: dfquaresma/shedding-test:latest
