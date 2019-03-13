@@ -16,7 +16,7 @@ public class Handler implements com.openfaas.model.IHandler {
 	if (header != null && hostname.equals(header)) {
 	    res.setStatusCode(503);
 	} else {
-		res.setStatusCode(200);
+	    res.setStatusCode(200);
 	}
 	
 	res.setBody(hostname + " " + header);
