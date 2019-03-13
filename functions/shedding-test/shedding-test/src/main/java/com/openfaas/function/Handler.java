@@ -10,15 +10,15 @@ public class Handler implements com.openfaas.model.IHandler {
     public IResponse Handle(IRequest req) {
 	Response res = new Response();
 
-        String processName = java.lang.management.ManagementFactory.getRuntimeMXBean().getName();
-	long pid = Long.parseLong(processName.split("@")[0]);
-	Long header = Long.parseLong(req.getHeader("pid"));
-
-	res.setBody(Long.toString(pid) + " " + Long.toString(header));
-	if (pid == header) {
+    String processName = java.lang.management.ManagementFactory.getRuntimeMXBean().getName();
+	String pid = processName.split("@")[0]; 
+	String pidHeader = req.getHeader("X-pid");
+	
+	if (pidHeader != null && pid.equals(pidHeader)) {
 	    res.setStatusCode(503);
-	};
-
+	}
+	
+	res.setBody(pid + " " + pidHeader);
 	return res;
-    }
+	}
 }
