@@ -144,3 +144,29 @@ quantiles_dataframe_comparison = function(nocollect, withcollect) {
     comparison = comparison
   )
 }
+
+print_summary_table <- function(runtime_language, nocollect, withcollect) {
+  nocollectreq <- nocollect$execution_time
+  withcollectreq <- withcollect$execution_time
+  
+  stats <- function(df, tag) {
+    p50 = quantileCI::quantile_confint_nyblom(df, 0.5)
+    p95 = quantileCI::quantile_confint_nyblom(df, 0.95)
+    p99 = quantileCI::quantile_confint_nyblom(df, 0.99)
+    p999 = quantileCI::quantile_confint_nyblom(df, 0.999)
+    p9999 = quantileCI::quantile_confint_nyblom(df, 0.9999)
+    
+    cat("Latency(ms) ", tag, " ")
+    cat("avg:", signif(t.test(df)$conf.int, digits = 2), " | ")
+    cat("50:", signif(p50, digits = 4), " | ")
+    cat("95:", signif(p95, digits = 4), " | ")
+    cat("99:", signif(p99, digits = 4), " | ")
+    cat("99.9:", signif(p999, digits = 4), " | ")
+    cat("99.99:", signif(p9999, digits = 4), " | ")
+    cat("Dist.Tail.:", signif(p9999-p50, digits = 4))
+    cat("\n")
+  }
+  
+  stats(nocollectreq, paste(runtime_language, " NC", sep=""))
+  stats(withcollectreq, paste(runtime_language, " C ", sep=""))
+}
