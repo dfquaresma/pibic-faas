@@ -1,0 +1,111 @@
+---
+title: "Garbage Collector Impact"
+author: "David Ferreira Quaresma (david.quaresma@ccc.ufcg.edu.br)"
+date: "janeiro, 2019"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+require(dplyr)
+require(ggplot2)
+require(quantileCI)
+source("functions.R")
+```
+
+# Descrição
+Os resultados analisados neste documento foram obtidos através da execução de múltiplas chamadas de uma mesma função de modo sequencial, isto é, não concorrente. Para tal, utilizamos o script [**curl-workload**](https://github.com/dfquaresma/pibic-faas/blob/master/analysis/curl-workload.sh) para gerar carga e observar o impacto do coletor de lixo no [**thumbnailator-server**](https://github.com/dfquaresma/pibic-faas/tree/master/functions/thumbnailator/thumbnailator-server-maven).
+
+# Experimento
+#### Função e Ambiente
+- Ambiente de execução: [**servidor HTTP extraído do OpenFaaS**](https://github.com/dfquaresma/pibic-faas/blob/master/http-servers/thumbnailator-server-maven/src/main/java/com/thumbnailator/server/App.java).
+- Lógica de negócio da função: [**Redimencionamento de uma imagem**](https://github.com/dfquaresma/pibic-faas/blob/master/http-servers/thumbnailator-server-maven/src/main/java/com/thumbnailator/function/Handler.java).
+- Escala de redimencionamento: 0.1.
+- Tamanho da imagem: 131kb.
+
+#### Setup
+- workload: 10.000 requisições enviadas sequencialmente.
+- jvm: openjdk version "11"
+- gc:  Garbage First Garbage Collector (G1 GC) 
+- heap: 128mb
+- taskset: 2 CPUs
+
+#### Dados observados 
+- Quantidade de coletas de lixo durante execução da função.
+- Duração das coletas de lixo durante execução da função.
+- Tempo de execução da função.
+
+#### Observações:
+- Scavenge: coleta na Young Gen.
+- MarkSweep: coleta na Old Gen.
+- Warmup: removemos as 100 primeiras requisições
+
+# Resultados
+```{r}
+results = read.csv("./results/thumbnailator-01s-131kb-128h-j11.csv", header=T, dec=".")
+results = tail(results, -100)
+nocollect <- filter(results, scavenge_count + marksweep_count == 0)
+withcollect <- filter(results, scavenge_count + marksweep_count > 0)
+```
+
+## Número de coletas
+```{r}
+coletas_dataframe(results)
+```
+
+## Scatterplot
+```{r}
+time_collecting = results$scavenge_time + results$marksweep_time
+plot(results$execution_time, time_collecting, xlab="tempo de execução (ms)",
+     ylab="duração das coletas", main="Tempo de Execução X Duração das Coletas")
+```
+
+## Correlação Linear
+```{r}
+cor_dataframe(results)
+```
+
+## Boxplot
+```{r}
+boxplot(nocollect$execution_time, withcollect$execution_time, outline=FALSE,
+        names=c("Não Ocorreu Coleta", "Ocorreu Coleta"), main="Tempo de execução")
+```
+
+## Média, Variância e Desvio Padrão
+```{r}
+meanVarSd(nocollect, withcollect)
+```
+
+## Barplot
+```{r}
+build_barplot(results, running_names = c("08-10 ms", "11-11 ms", "12-16 ms", "17-197 ms"),
+              collecting_names = c("00-00 ms collecting", "01-01 ms collecting",
+                "02-08 ms collecting", "09-28 ms collecting"))
+```
+
+## ECDF
+```{r}
+graph_tail(nocollect$execution_time, withcollect$execution_time,
+           title="ECDF", x_limit_inf=0, x_limit_sup=200, annotate_y=0.90)
+```
+
+## Quantiles
+### Tempo coletando
+```{r}
+quantile_wrapped(time_collecting)
+```
+
+### Tempo executando 
+##### Com e Sem Coleta
+```{r}
+quantile_wrapped_for_execution_time(results)
+```
+
+##### Comparação: Sem coleta X Com coleta
+```{r}
+quantiles_dataframe_comparison(nocollect, withcollect)
+```
+
+##### Comparação: Sem coleta X Com coleta
+```{r}
+print_summary_table("Thumbnailator", nocollect, withcollect)
+```
