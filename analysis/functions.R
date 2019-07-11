@@ -160,7 +160,7 @@ print_summary_table <- function(runtime_language, nocollect, withcollect) {
     cat("avg:", signif(t.test(df)$conf.int, digits = 2), " | ")
     cat("50:", signif(p50, digits = 4), " | ")
     cat("95:", signif(p95, digits = 4), " | ")
-    cat("99:", signif(p99, digits = 4), " | ")
+    cat("99:", signif(p99, digits = 4), " |\n")
     cat("99.9:", signif(p999, digits = 4), " | ")
     cat("99.99:", signif(p9999, digits = 4), " | ")
     cat("Dist.Tail.:", signif(p9999-p50, digits = 4))
