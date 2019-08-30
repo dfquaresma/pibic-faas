@@ -53,7 +53,7 @@ public class Handler implements com.openfaas.model.IHandler {
     }
 
     public String callFunction() {
-        return null;
+        return "";
     }
 
 }
