@@ -52,10 +52,13 @@ coletas_dataframe(results)
 ```
 
 ## Scatterplot
-```{r}
+```{r fig.height = 4, fig.width = 10}
 time_collecting = results$scavenge_time + results$marksweep_time
 plot(results$execution_time, time_collecting, xlab="tempo de execução (ms)",
      ylab="duração das coletas", main="Tempo de Execução X Duração das Coletas")
+abline(lm(results$execution_time~time_collecting), col="red")
+legend(720, 150, legend=c("regressão linear"),
+       col=c("red"), lty=1:2, cex=0.9)
 ```
 
 ## Correlação Linear
@@ -76,15 +79,15 @@ meanVarSd(nocollect, withcollect)
 
 ## Barplot
 ```{r}
-build_barplot(results, running_names = c("08-10 ms", "11-11 ms", "12-16 ms", "17-197 ms"),
+build_barplot(results, running_names = c("p0 - p25", "p25 - p90", "p90 - p95", "p95 - p99.999"),
               collecting_names = c("00-00 ms collecting", "01-01 ms collecting",
                 "02-08 ms collecting", "09-28 ms collecting"))
 ```
 
 ## ECDF
-```{r}
+```{r fig.height = 3, fig.width = 10}
 graph_tail(nocollect$execution_time, withcollect$execution_time,
-           title="ECDF", x_limit_inf=0, x_limit_sup=200, annotate_y=0.90)
+           title="LISTFILLER ECDF", x_limit_inf=0, x_limit_sup=875, annotate_y=0.90)
 ```
 
 ## Quantiles

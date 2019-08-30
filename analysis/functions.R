@@ -18,14 +18,15 @@ interval = function(data, p0, p1, p2, names) {
 }
 
 build_barplot = function(results, running_names, collecting_names) {
-  time_running = interval(results$execution_time, .25, .75, .95
-                          , c("0-25", "25-75", "75-95", "95-100"))
+  time_running = interval(results$execution_time, .25, .90, .95, running_names)
   time_collencting = interval(results$scavenge_time, .25, .95, .99, collecting_names)
   
   counts <- table(time_collencting, time_running)
   barplot(counts, main="",
-          xlab="tempo de execução", ylab="Frequência", col=c("white","gray", "black", "red"),
-          names = running_names, legend = rownames(counts))
+          xlab="tempo de execução", 
+          ylab="Frequência", 
+          col=c("white","gray", "black", "red"),
+          legend = rownames(counts))
 }
 
 plot_ecdf = function(nocollect, withcollect, limit) {
