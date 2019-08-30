@@ -42,7 +42,7 @@ ENV mode="http"
 ENV CLASSPATH="/home/app/entrypoint-1.0/lib/*"
 ENV to_power_of="21"
 
-ENV fprocess="java -XX:+UnlockExperimentalVMOptions com.openfaas.entrypoint.App"
+ENV fprocess="java -Xms128m -Xmx128m -XX:+UseG1GC -XX:+UnlockExperimentalVMOptions com.openfaas.entrypoint.App"
 EXPOSE 8080
 
 HEALTHCHECK --interval=2s CMD [ -e /tmp/.lock ] || exit 1
