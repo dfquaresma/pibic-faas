@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.ArrayList;
 import java.lang.Error;
 
-import net.coobird.openfaas.Thumbnails;
+import net.coobird.thumbnailator.Thumbnails;
 import java.net.URL;
 import java.awt.image.BufferedImage;
 import javax.imageio.ImageIO;
