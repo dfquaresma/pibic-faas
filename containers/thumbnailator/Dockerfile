@@ -42,7 +42,7 @@ ENV mode="http"
 ENV CLASSPATH="/home/app/entrypoint-1.0/lib/*"
 
 ENV scale="0.1"
-ENV image_url="http://s3.amazonaws.com/wallpapers2/wallpapers/images/000/000/408/original/375.jpg?1487671636"
+ENV image_url="https://i.imgur.com/BhlDUOR.jpg"
 
 ENV fprocess="java -Xms128m -Xmx128m -XX:+UseG1GC -XX:+UnlockExperimentalVMOptions com.openfaas.entrypoint.App"
 EXPOSE 8080
