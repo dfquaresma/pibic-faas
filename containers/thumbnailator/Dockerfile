@@ -44,7 +44,7 @@ ENV CLASSPATH="/home/app/entrypoint-1.0/lib/*"
 ENV scale="0.1"
 ENV image_url="https://i.imgur.com/BhlDUOR.jpg"
 
-ENV fprocess="java -Xms128m -Xmx128m -XX:+UseG1GC -XX:+UnlockExperimentalVMOptions com.openfaas.entrypoint.App"
+ENV fprocess="java -Xms512m -Xmx512m -XX:+UseG1GC -XX:+UnlockExperimentalVMOptions com.openfaas.entrypoint.App"
 EXPOSE 8080
 
 HEALTHCHECK --interval=2s CMD [ -e /tmp/.lock ] || exit 1
