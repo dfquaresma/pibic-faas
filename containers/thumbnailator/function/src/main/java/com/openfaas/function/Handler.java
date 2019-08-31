@@ -9,11 +9,10 @@ import java.lang.management.GarbageCollectorMXBean;
 import java.lang.management.ManagementFactory;
 
 import java.util.List;
+import java.util.ArrayList;
 import java.lang.Error;
 
-import java.awt.geom.AffineTransform;
-import java.awt.image.AffineTransformOp;
-
+import net.coobird.openfaas.Thumbnails;
 import java.net.URL;
 import java.awt.image.BufferedImage;
 import javax.imageio.ImageIO;
@@ -72,16 +71,16 @@ public class Handler implements com.openfaas.model.IHandler {
     public String callFunction() {
         String err = "";
         try {
-            AffineTransform transform = AffineTransform.getScaleInstance(scale, scale); 
-            AffineTransformOp op = new AffineTransformOp(transform, AffineTransformOp.TYPE_BILINEAR); 
-            op.filter(image, null).flush();
-
+            Thumbnails.of(image)
+                .scale(scale)
+                .asBufferedImage();
+        	
         } catch (Exception e) {
             err = e.toString() + System.lineSeparator()
             		+ e.getCause() + System.lineSeparator()
             		+ e.getMessage();
             e.printStackTrace();
-
+           
         } catch (Error e) {
             err = e.toString() + System.lineSeparator()
             		+ e.getCause() + System.lineSeparator()
