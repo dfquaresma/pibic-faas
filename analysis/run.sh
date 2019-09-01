@@ -7,7 +7,7 @@ echo "EXPID_START: ${EXPID_START:=0}"
 echo "EXPID_END: ${EXPID_END:=2}"
 echo "FUNCTIONS: ${FUNCTIONS:=thumb listfiller}"
 
-for func in ${FUNCTION};
+for func in ${FUNCTIONS};
 do
     sudo rm -rf "./results/${func}-container-*.csv"
     for expid in `seq ${EXPID_START} ${EXPID_END}`
