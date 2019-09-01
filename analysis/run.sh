@@ -5,7 +5,7 @@ set -x
 
 echo "EXPID_START: ${EXPID_START:=0}"
 echo "EXPID_END: ${EXPID_END:=2}"
-echo "FUNCTION: ${FUNCTION:=thumb}"
+echo "FUNCTIONS: ${FUNCTIONS:=thumb listfiller}"
 
 for func in ${FUNCTION};
 do
